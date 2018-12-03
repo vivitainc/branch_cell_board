@@ -173,6 +173,7 @@ asm("  .section .version\n"
 #ifndef LED_START_FLASHES
 #define LED_START_FLASHES 0
 #endif
+//#define LED_DATA_FLASH
 
 #ifdef LUDICROUS_SPEED
 #define BAUD_RATE 230400L
@@ -296,7 +297,12 @@ int main(void) {
   // Adaboot no-wait mod
   ch = MCUSR;
   MCUSR = 0;
-  if (!(ch & _BV(EXTRF))) appStart();
+  //if (!(ch & _BV(EXTRF))) appStart();
+  /* Set LED pin as output */
+  DDRD |= _BV(PIND6);
+  while(1) {
+    PORTD |= _BV(PIND6);
+  }
 
 #if LED_START_FLASHES > 0
   // Set up Timer 1 for timeout counter
@@ -317,6 +323,11 @@ int main(void) {
   UBRR0L = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
 #endif
 #endif
+  DDRB = DDRB  |  0x01;
+  PORTB = PORTB | 0x01; // PIN_EN_TX to high
+
+  DDRD = DDRD  |  0x80;
+  PORTD = PORTD | 0x80; // PIN_EN_RX to high
 
   // Set up watchdog to trigger after 500ms
   watchdogConfig(WATCHDOG_1S);
@@ -509,6 +520,7 @@ int main(void) {
     }
     putch(STK_OK);
   }
+  appStart();
 }
 
 void putch(char ch) {
