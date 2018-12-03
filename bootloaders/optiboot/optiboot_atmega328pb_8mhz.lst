@@ -47,9 +47,9 @@ Disassembly of section .text:
     7804:	14 be       	out	0x34, r1	; 52
   //if (!(ch & _BV(EXTRF))) appStart();
   /* Set LED pin as output */
-  DDRD |= _BV(PIND6);
+  LED_DDR |= _BV(LED);
     7806:	56 9a       	sbi	0x0a, 6	; 10
   while(1) {
-    PORTD |= _BV(PIND6);
+    LED_PORT |= _BV(LED);
     7808:	5e 9a       	sbi	0x0b, 6	; 11
     780a:	fe cf       	rjmp	.-4      	; 0x7808 <main+0x8>
