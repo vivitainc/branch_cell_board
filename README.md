@@ -1,3 +1,10 @@
+# How to build bootloader for ATmega328PB on Windows
+```
+cd bootloaders/optiboot
+mingw32-make.exe clean
+mingw32-make.exe atmega328pb_8mhz
+```
+
 # Pololu A-Star Software and Drivers
 
 Version: 4.0.2<br>
