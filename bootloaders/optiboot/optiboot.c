@@ -171,9 +171,9 @@ asm("  .section .version\n"
 #include "stk500.h"
 
 #ifndef LED_START_FLASHES
-#define LED_START_FLASHES 0
+#define LED_START_FLASHES 1
 #endif
-//#define LED_DATA_FLASH
+#define LED_DATA_FLASH
 
 #ifdef LUDICROUS_SPEED
 #define BAUD_RATE 230400L
@@ -299,10 +299,10 @@ int main(void) {
   MCUSR = 0;
   //if (!(ch & _BV(EXTRF))) appStart();
   /* Set LED pin as output */
-  LED_DDR |= _BV(LED);
-  while(1) {
-    LED_PORT |= _BV(LED);
-  }
+  //LED_DDR |= _BV(LED);
+  //while(1) {
+  //  LED_PORT |= _BV(LED);
+  //}
 
 #if LED_START_FLASHES > 0
   // Set up Timer 1 for timeout counter
@@ -323,11 +323,17 @@ int main(void) {
   UBRR0L = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
 #endif
 #endif
-  DDRB = DDRB  |  0x01;
-  PORTB = PORTB | 0x01; // PIN_EN_TX to high
+  // PIN_EN_TX to high
+  DDRB |= _BV(PINB0);
+  PORTB |= _BV(PINB0);
+  //DDRB = DDRB  |  0x01;
+  //PORTB = PORTB | 0x01; 
 
-  DDRD = DDRD  |  0x80;
-  PORTD = PORTD | 0x80; // PIN_EN_RX to high
+  // PIN_EN_RX to high
+  DDRD |= _BV(PIND7);
+  PORTD |= _BV(PIND7);
+  //DDRD = DDRD  |  0x80;
+  //PORTD = PORTD | 0x80; 
 
   // Set up watchdog to trigger after 500ms
   watchdogConfig(WATCHDOG_1S);
@@ -520,7 +526,7 @@ int main(void) {
     }
     putch(STK_OK);
   }
-  appStart();
+  //appStart();
 }
 
 void putch(char ch) {
