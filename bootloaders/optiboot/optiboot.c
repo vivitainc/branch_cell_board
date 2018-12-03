@@ -299,9 +299,9 @@ int main(void) {
   MCUSR = 0;
   //if (!(ch & _BV(EXTRF))) appStart();
   /* Set LED pin as output */
-  DDRD |= _BV(PIND6);
+  LED_DDR |= _BV(LED);
   while(1) {
-    PORTD |= _BV(PIND6);
+    LED_PORT |= _BV(LED);
   }
 
 #if LED_START_FLASHES > 0
