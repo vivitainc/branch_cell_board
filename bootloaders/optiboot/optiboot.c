@@ -323,17 +323,23 @@ int main(void) {
   UBRR0L = (uint8_t)( (F_CPU + BAUD_RATE * 4L) / (BAUD_RATE * 8L) - 1 );
 #endif
 #endif
+  while(1) { //test
   // PIN_EN_TX to high
   DDRB |= _BV(PINB0);
   PORTB |= _BV(PINB0);
+  //PINB |= _BV(PINB0);
   //DDRB = DDRB  |  0x01;
   //PORTB = PORTB | 0x01; 
 
   // PIN_EN_RX to high
   DDRD |= _BV(PIND7);
   PORTD |= _BV(PIND7);
+  //PIND |= _BV(PIND7);
   //DDRD = DDRD  |  0x80;
   //PORTD = PORTD | 0x80; 
+  //putch('V');
+  //putch('I');
+  } //test
 
   // Set up watchdog to trigger after 500ms
   watchdogConfig(WATCHDOG_1S);
@@ -350,6 +356,8 @@ int main(void) {
   /* Flash onboard LED to signal entering of bootloader */
   flash_led(LED_START_FLASHES * 2);
 #endif
+
+  putch('0');
 
   /* Forever loop */
   for (;;) {
