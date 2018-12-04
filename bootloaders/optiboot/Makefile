@@ -23,10 +23,10 @@ PROGRAM    = optiboot
 # Arduino user IDE setup, or the Arduino source tree.
 # Uncomment this next lines to build within the arduino environment,
 # using the arduino-included avrgcc toolset (mac and pc)
-ENV = arduino
+#ENV = arduino
 # ENV ?= arduinodev
 # OS ?= macosx
-# OS ?= windows
+OS = windows
 
 
 # enter the parameters for the avrdude isp tool
@@ -69,7 +69,7 @@ ifeq ($(OS), macosx)
 TOOLROOT = ../../../../build/macosx/work/Arduino.app/Contents/Resources/Java/hardware/tools
 endif
 ifeq ($(OS), windows)
-TOOLROOT = ../../../../build/windows/work/hardware/tools
+TOOLROOT = ../../tools
 endif
 
 GCCROOT = $(TOOLROOT)/avr/bin/
@@ -228,8 +228,7 @@ atmega328pb_8mhz: TARGET = atmega328pb
 atmega328pb_8mhz: MCU_TARGET = atmega328p
 atmega328pb_8mhz: CFLAGS += '-DLED_START_FLASHES=3' '-DBAUD_RATE=57600' '-DREALLY_328PB'
 atmega328pb_8mhz: AVR_FREQ = 8000000L
-atmega328pb_8mhz: LDSECTIONS  = -Wl,--section-start=.text=0x7d00 -Wl,--section-start=.version=0x7ffe
-#atmega328pb_8mhz: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
+atmega328pb_8mhz: LDSECTIONS  = -Wl,--section-start=.text=0x7e00 -Wl,--section-start=.version=0x7ffe
 atmega328pb_8mhz: $(PROGRAM)_atmega328pb_8mhz.hex
 atmega328pb_8mhz: $(PROGRAM)_atmega328pb_8mhz.lst
 
