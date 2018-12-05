@@ -297,21 +297,21 @@ if [ -n "${flg_clean}" ]; then
   rm -r "${DIR_LIB}/${DIR_OWN_LIB}"
 fi
 
-if [ -n "${flg_build_all}" ] || [ -n "${REL_INO_FILE}" ]; then
+#if [ -n "${flg_build_all}" ] || [ -n "${REL_INO_FILE}" ]; then
   # Copy root *.h *.cpp to ${DIR_LIB}
   #for lib_file in `\find . -maxdepth 1 -type f -name *.h | sed 's!^.*/!!'`; do
-  for lib_file in `ls -1 *.cpp *.h`; do
-    if [ ! -e "${DIR_LIB}/${DIR_OWN_LIB}" ]; then
-      mkdir -p "${DIR_LIB}/${DIR_OWN_LIB}"
-    fi
-    cp "${lib_file}" "${DIR_LIB}/${DIR_OWN_LIB}"
-    echo "Copied ${lib_file} to ${DIR_LIB}/${DIR_OWN_LIB}"
-  done
+#  for lib_file in `ls -1 *.cpp *.h`; do
+#    if [ ! -e "${DIR_LIB}/${DIR_OWN_LIB}" ]; then
+#      mkdir -p "${DIR_LIB}/${DIR_OWN_LIB}"
+#    fi
+#    cp "${lib_file}" "${DIR_LIB}/${DIR_OWN_LIB}"
+#    echo "Copied ${lib_file} to ${DIR_LIB}/${DIR_OWN_LIB}"
+#  done
 
   # Copy libraries directory to ${DIR_LIB}
-  cp -R ${DIR_EX_LIB}/* "${DIR_LIB}/"
-  echo "Copied ${DIR_EX_LIB}/* to ${DIR_LIB}/"
-fi
+#  cp -R ${DIR_EX_LIB}/* "${DIR_LIB}/"
+#  echo "Copied ${DIR_EX_LIB}/* to ${DIR_LIB}/"
+#fi
 
 if [ -n "${FW_ARG}" ]; then
   if [ ! -e "${REL_INO_FILE}" ]; then
