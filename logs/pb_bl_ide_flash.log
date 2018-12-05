@@ -1,4 +1,4 @@
-C:\Program Files (x86)\Arduino\hardware\tools\avr/bin/avrdude -CC:\Program Files (x86)\Arduino\hardware\tools\avr/etc/avrdude.conf -C+C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/extra_avrdude.conf -v -patmega328pb -carduino -PCOM4 -b19200 -B 5 -e -Ulock:w:0xFF:m -Uefuse:w:0xF5:m -Uhfuse:w:0xDE:m -Ulfuse:w:0xFF:m 
+C:\Program Files (x86)\Arduino\hardware\tools\avr/bin/avrdude -CC:\Program Files (x86)\Arduino\hardware\tools\avr/etc/avrdude.conf -C+C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/extra_avrdude.conf -v -patmega328pb -carduino -PCOM4 -b19200 -B 5 -e -Ulock:w:0xFF:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m 
 
 avrdude: Version 6.3-20171130
          Copyright (c) 2000-2005 Brian Dean, http://www.bdmicro.com/
@@ -91,15 +91,15 @@ Reading | ################################################## | 100% 0.01s
 
 avrdude: verifying ...
 avrdude: 1 bytes of efuse verified
-avrdude: reading input file "0xDE"
+avrdude: reading input file "0xD2"
 avrdude: writing hfuse (1 bytes):
 
 Writing | ################################################## | 100% 0.02s
 
 avrdude: 1 bytes of hfuse written
-avrdude: verifying hfuse memory against 0xDE:
-avrdude: load data hfuse data from input file 0xDE:
-avrdude: input file 0xDE contains 1 bytes
+avrdude: verifying hfuse memory against 0xD2:
+avrdude: load data hfuse data from input file 0xD2:
+avrdude: input file 0xD2 contains 1 bytes
 avrdude: reading on-chip hfuse data:
 
 Reading | ################################################## | 100% 0.01s
@@ -117,13 +117,6 @@ avrdude: load data lfuse data from input file 0xFF:
 avrdude: input file 0xFF contains 1 bytes
 avrdude: reading on-chip lfuse data:
 
-Reading | ################################################## | 100% 0.01s
-
-avrdude: verifying ...
-avrdude: 1 bytes of lfuse verified
-
-avrdude done.  Thank you.
-
 C:\Program Files (x86)\Arduino\hardware\tools\avr/bin/avrdude -CC:\Program Files (x86)\Arduino\hardware\tools\avr/etc/avrdude.conf -C+C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/extra_avrdude.conf -v -patmega328pb -carduino -PCOM4 -b19200 -B 0.5 -Uflash:w:C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/bootloaders/optiboot/optiboot_atmega328pb_8mhz.hex:i -Ulock:w:0xCF:m 
 
 avrdude: Version 6.3-20171130
@@ -131,6 +124,13 @@ avrdude: Version 6.3-20171130
          Copyright (c) 2007-2014 Joerg Wunsch
 
          System wide configuration file is "C:\Program Files (x86)\Arduino\hardware\tools\avr/etc/avrdude.conf"
+Reading | ################################################## | 100% 0.01s
+
+avrdude: verifying ...
+avrdude: 1 bytes of lfuse verified
+
+avrdude done.  Thank you.
+
          Additional configuration file is "C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/extra_avrdude.conf"
 avrdude: warning at C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/extra_avrdude.conf:1: part m328pb overwrites previous definition C:\Program Files (x86)\Arduino\hardware\tools\avr/etc/avrdude.conf:8802.
 
@@ -188,7 +188,7 @@ avrdude: erasing chip
 avrdude: reading input file "C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/bootloaders/optiboot/optiboot_atmega328pb_8mhz.hex"
 avrdude: writing flash (32768 bytes):
 
-Writing | ################################################## | 100% 0.00s
+Writing | ################################################## | 100% -0.00s
 
 avrdude: 32768 bytes of flash written
 avrdude: verifying flash memory against C:\Users\tomohiro\AppData\Local\Arduino15\packages\pololu-a-star\hardware\avr\4.0.2/bootloaders/optiboot/optiboot_atmega328pb_8mhz.hex:

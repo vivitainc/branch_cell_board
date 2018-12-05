@@ -9,7 +9,8 @@ a-star328PB.upload.maximum_data_size=2048
 
 a-star328PB.bootloader.tool=avrdudecustom
 a-star328PB.bootloader.low_fuses=0xFF
-a-star328PB.bootloader.high_fuses=0xDE
+a-star328PB.bootloader.high_fuses=0xD2
+#a-star328PB.bootloader.high_fuses=0xDE
 a-star328PB.bootloader.unlock_bits=0xFF
 a-star328PB.bootloader.lock_bits=0xCF
 
