@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v1.0"
+VERSION="${PROGNAME} v1.1 for 328pb"
 echo
 echo ${VERSION}
 echo
@@ -31,13 +31,15 @@ CONF1_DEFAULT_FILE=${DIR_ARDUINO}\\hardware\\tools\\avr\\etc\\avrdude.conf
 CONF1_USR_FILE=${DIR_USER2}\\arduino\\tools\\avrdude\\6.3.0-arduino9\\etc\\avrdude.conf
 CONF2_FILE=${DIR_USER2}\\pololu-a-star\\hardware\\avr\\4.0.2\\extra_avrdude.conf
 
-DIR_INO_ROOT=examples
+DIR_INO_ROOT=dump
 DIR_BUILD=build
+DUMP_DIR=dump
+FW_ARG=flash
 
 FW_HEX_SUFFIX="ino.with_bootloader.hex"
 BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
 BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhz"
-DEFAULT_MICRO=328p
+DEFAULT_MICRO=328pb
 MICRO_OPTION="328p or 328pb"
 
 HARDWARE="-hardware "${DIR_HARDWARE1}
@@ -73,7 +75,7 @@ function Usage() {
   echo "  -b                         Set fuse bit"
   echo "  -u <max 6byte, hex>        Write 6byte unique id to EEPROM"
 COMMENTOUT
-  echo "  -f <sketch name>           Flash firmware w/ arduino bootloader"
+  echo "  -f <dump file name>        Dump file name"
 #  echo "  -r                         Force recompile (also require -f option)"
   echo "  -m <mcu_name>              Specify the target MCU ${MICRO_OPTION}"
 #  echo "  -F                         Force flash in avrdude even if device signature is invalid"
@@ -112,34 +114,6 @@ while(( $# > 0 )); do
             shift
             break
             ;;
-<< COMMENTOUT
-          'u')
-            # unique id
-            uid=("$2")
-            if [ ${#uid} -lt 2 ] || [ ${#uid} -gt 12 ]; then
-              echo "-u: Invalid argument"
-              echo "${uid}"
-              exit
-            fi
-            shift
-            break
-            ;;
-          'b')
-            # Fuse bit, Lock bit etc.
-            flg_fuse=1
-            break
-            ;;
-          'r')
-            # Recompile
-            flg_recompile=1
-            break
-            ;;
-          'F')
-            # avrdude -F
-            FORCE_OPTION="-F"
-            break
-            ;;
-COMMENTOUT
           'f')
             # firmware
             FW_ARG=("$2")
@@ -202,6 +176,7 @@ fi
 #echo "MCU_UPPER=${MCU_UPPER}"
 
 # Analysis ${FW_ARG} and create ${INO_DIR_NAME}, ${REL_HEX_FILE} and ${REL_INO_FILE}
+
 if [ -n "${FW_ARG}" ]; then
   if [ -e "${FW_ARG}" ]; then
     if [ -f "${FW_ARG}" ] && [ ${FW_ARG##*.} = ino ]; then
@@ -219,6 +194,10 @@ if [ -n "${FW_ARG}" ]; then
       REL_BUILD_DIR="${FW_ARG%/*}"
       REL_INO_FILE="${REL_BUILD_DIR%/${DIR_BUILD}}/${INO_DIR_NAME}.ino"
       #echo "${FW_ARG} = hex file full path"
+    elif [ -f "${FW_ARG}" ] && [ ${FW_ARG#*.} != "" ]; then
+      # If ${FW_ARG} is dump file full path
+      INO_FILE_NAME=${FW_ARG##*/}
+      INO_DIR_NAME=${INO_FILE_NAME%%.*}
     else
       # If ${FW_ARG} is ino directory full path
       INO_DIR_NAME=`basename ${FW_ARG}`
@@ -232,6 +211,12 @@ if [ -n "${FW_ARG}" ]; then
     REL_HEX_FILE="${DIR_INO_ROOT}/${INO_DIR_NAME}/${DIR_BUILD}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}"
     REL_INO_FILE="${DIR_INO_ROOT}/${INO_DIR_NAME}/${INO_DIR_NAME}.ino"
     #echo "${FW_ARG} = ino directory name"
+  elif [ ${FW_ARG#*.} != "" ]; then
+    # If ${FW_ARG} is dump file full path
+    INO_FILE_NAME=${FW_ARG##*/}
+    INO_DIR_NAME=${INO_FILE_NAME%%.*}
+  else
+    INO_DIR_NAME=${FW_ARG}
   fi
   #echo "INO_DIR_NAME=${INO_DIR_NAME}"
   #echo "REL_HEX_FILE=${REL_HEX_FILE}"
@@ -252,11 +237,8 @@ fi
 
 -----------------------------
 MCU      : ${MCU_UPPER}
-OPTION-F : ${FORCE_OPTION}
 PORT     : ${PORT_PREFIX}${com}
-UID      : $uid
-FIRMWARE : $INO_DIR_NAME
-FUSE     : $flg_fuse
+FILENAME : $INO_DIR_NAME
 -----------------------------
 
 _EOS_
@@ -289,10 +271,11 @@ fi
 
 DIR_INO_PATH=${DIR_INO_ROOT}/${INO_DIR_NAME}
 DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
-if [ ! -e "${DIR_REL_BUILD_PATH}" ]; then
-  mkdir "${DIR_REL_BUILD_PATH}"
-fi
+#if [ ! -e "${DIR_REL_BUILD_PATH}" ]; then
+#  mkdir "${DIR_REL_BUILD_PATH}"
+#fi
 
+<< COMMENTOUT
 if [ -n "${FW_ARG}" ]; then
   if [ -n "$flg_recompile" ] || [ ! -e "${REL_HEX_FILE}" ]; then
     echo "Compile firmware w/bootloader for ATmega${MCU_UPPER}."
@@ -315,6 +298,7 @@ if [ -n "${FW_ARG}" ]; then
   fi
 
   echo "Flash firmware w/bootloader to ATmega${MCU_UPPER}."
+COMMENTOUT
 
   # Preserve EEPROM
   #if [ ! -n "$flg_fuse" ]; then
@@ -325,6 +309,11 @@ if [ -n "${FW_ARG}" ]; then
   #echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
   #avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
 
-  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.dump:i
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.dump:i
-fi
+  if [ ! -e "${DUMP_DIR}" ]; then
+    mkdir "${DUMP_DIR}"
+  fi
+  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${DUMP_DIR}/${INO_DIR_NAME}.dump:i
+  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${DUMP_DIR}/${INO_DIR_NAME}.dump:i
+  echo
+  echo "Successfully ${DUMP_DIR}/${INO_DIR_NAME}.dump retrieved for ATmega${MCU_UPPER}."
+#fi
