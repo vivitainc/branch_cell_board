@@ -146,6 +146,11 @@ for opt in "$@"; do
     esac
 done
 
+# Set FW to examples/Blink by default
+if [ -z "${FW_ARG}" ] && [ -z "${flg_build_all}" ]; then
+  FW_ARG=examples/Blink/
+fi
+
 # Arg without option
 PARAM1="${PARAM}"; PARAM=("${PARAM[@]:1}")
 #echo "PARAM1=${PARAM1}"
