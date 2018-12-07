@@ -351,6 +351,14 @@ int main(void) {
   flash_led(LED_START_FLASHES * 2);
 #endif
 
+  //#define MAX_TIME_COUNT (F_CPU>>3) //(F_CPU>>4)
+	//uint32_t count = 0;
+  //while(1) {
+  //  putch(ch);
+  //  while (++count < MAX_TIME_COUNT)
+  //    ;
+  //}
+
   /* Forever loop */
   for (;;) {
     /* get character from UART */
@@ -595,8 +603,17 @@ uint8_t getch(void) {
       "r25"
 );
 #else
-  while(!(UCSR0A & _BV(RXC0)))
-    ;
+  //while(!(UCSR0A & _BV(RXC0)))
+  //  ;
+  #define MAX_TIME_COUNT (F_CPU>>4)
+  uint32_t count = 0;
+  while(!(UCSR0A & _BV(RXC0))) {
+    count++;
+    if (count > MAX_TIME_COUNT) {
+      appStart();
+    }
+  }
+
   if (!(UCSR0A & _BV(FE0))) {
       /*
        * A Framing Error indicates (probably) that something is talking
