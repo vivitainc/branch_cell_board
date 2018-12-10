@@ -308,11 +308,11 @@ DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
   #fi
 
   # Fuse
-  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 5 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 5 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
   # Flash
-  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_BOOTLOADER}/${BOOTLOADER_NAME}:i
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_BOOTLOADER}/${BOOTLOADER_NAME}:i
+  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -Uflash:w:${DIR_BOOTLOADER}/${BOOTLOADER_NAME}:i
+  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -Uflash:w:${DIR_BOOTLOADER}/${BOOTLOADER_NAME}:i
 
   echo
   echo "Successfully ${DIR_BOOTLOADER}/${BOOTLOADER_NAME} flashed for ATmega${MCU_UPPER}."
