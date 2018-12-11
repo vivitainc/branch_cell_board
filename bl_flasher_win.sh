@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v1.0 for 328pb"
+VERSION="${PROGNAME} v1.1 for 328pb"
 echo
 echo ${VERSION}
 echo
@@ -31,9 +31,8 @@ CONF1_DEFAULT_FILE=${DIR_ARDUINO}\\hardware\\tools\\avr\\etc\\avrdude.conf
 CONF1_USR_FILE=${DIR_USER2}\\arduino\\tools\\avrdude\\6.3.0-arduino9\\etc\\avrdude.conf
 CONF2_FILE=${DIR_USER2}\\pololu-a-star\\hardware\\avr\\4.0.2\\extra_avrdude.conf
 
-DIR_INO_ROOT=dump
+DIR_INO_ROOT=examples
 DIR_BUILD=build
-DUMP_DIR=dump
 FW_ARG=flash
 
 DIR_BOOTLOADER=bootloaders\\optiboot
