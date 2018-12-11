@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v1.4 for 328pb"
+VERSION="${PROGNAME} v2.0 for 328pb"
 echo
 echo ${VERSION}
 echo
@@ -33,7 +33,7 @@ FW_HEX_SUFFIX="ino.with_bootloader.hex"
 BUILD_OPTION_FILE="build.options.json"
 BUILD_LOG_NAME="build.log"
 BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
-BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhz"
+BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzB"
 DEFAULT_MICRO=328pb
 MICRO_OPTION="328p or 328pb"
 
