@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v2.0 for 328pb"
+VERSION="${PROGNAME} v3.0 for 328pb"
 echo
 echo ${VERSION}
 echo
@@ -35,12 +35,16 @@ DIR_INO_ROOT=examples
 DIR_BUILD=build
 FW_ARG=flash
 
-DIR_BOOTLOADER=bootloaders\\optiboot
-BOOTLOADER_NAME=optiboot_atmega328pb_8mhz.hex
+DIR_BOOTLOADER_328P=bootloaders\\atmega
+BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+
+DIR_BOOTLOADER_328PB=bootloaders\\optiboot
+BOOTLOADER_NAME_328PB_SRC=optiboot_atmega328pb_8mhz.hex
 
 FW_HEX_SUFFIX="ino.with_bootloader.hex"
 BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
 BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzB"
+DEFAULT_BOOTLOADER=328p
 DEFAULT_MICRO=328pb
 MICRO_OPTION="328p or 328pb"
 
@@ -73,14 +77,8 @@ function Usage() {
   echo "Option: -p option must be required"
   echo "  -h                         Help"
   echo "  -p <port number or name>   Port number or name to Arduino ISP"
-<< COMMENTOUT
-  echo "  -b                         Set fuse bit"
-  echo "  -u <max 6byte, hex>        Write 6byte unique id to EEPROM"
-COMMENTOUT
-#  echo "  -f <dump file name>        Dump file name"
-#  echo "  -r                         Force recompile (also require -f option)"
+  echo "  -t <mcu_name>              Specify the target bootloader ${MICRO_OPTION}"
   echo "  -m <mcu_name>              Specify the target MCU ${MICRO_OPTION}"
-#  echo "  -F                         Force flash in avrdude even if device signature is invalid"
   echo
   exit 1
 }
@@ -116,12 +114,16 @@ while(( $# > 0 )); do
             shift
             break
             ;;
-#          'f')
-#            # firmware
-#            FW_ARG=("$2")
-#            shift
-#            break
-#            ;;
+          't')
+            # target bootloader
+            if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
+              echo "${PROGNAME}: $1 option requires an argument" 1>&2
+              echo "Provide ${MICRO_OPTION}" 1>&2
+              exit 1
+            fi
+            BL_ARG=("$2")
+            shift
+            ;;
           'm')
             # mcu must need an arg
             if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
@@ -143,6 +145,25 @@ while(( $# > 0 )); do
   esac
   shift
 done
+
+# Verify ${BL_ARG} and define ${FIXED_DIR_BOOTLOADER} and ${FIXED_BOOTLOADER_NAME_SRC} and ${FIXED_BOOTLOADER_NAME_DST} and ${FIXED_MAKE_OPTION}
+if [ ! -n "${BL_ARG}" ]; then
+  BL_TYPE=${DEFAULT_BOOTLOADER}
+else
+  BL_TYPE=${BL_ARG}
+fi
+BL_UPPER=`echo ${BL_TYPE} | tr '[a-z]' '[A-Z]'`
+if [ "${BL_UPPER}" = "328P" ]; then
+  FIXED_DIR_BOOTLOADER=${DIR_BOOTLOADER_328P}
+  FIXED_BOOTLOADER_NAME_SRC=${BOOTLOADER_NAME_328P_SRC}
+elif [ "${BL_UPPER}" = "328PB" ]; then
+  FIXED_DIR_BOOTLOADER=${DIR_BOOTLOADER_328PB}
+  FIXED_BOOTLOADER_NAME_SRC=${BOOTLOADER_NAME_328PB_SRC}
+else
+  echo "Cannot recognize -t argument ${BL_ARG}" 1>&2
+  echo "Provide ${MICRO_OPTION}" 1>&2
+  exit 1
+fi
 
 # If ${CONF1_USR_FILE} does not exist, use ${CONF1_DEFAULT_FILE} instead
 if [ ! -e "${CONF1_USR_FILE}" ]; then
@@ -310,9 +331,9 @@ DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
   echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
   avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
   # Flash
-  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -Uflash:w:${DIR_BOOTLOADER}/${BOOTLOADER_NAME}:i
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -Uflash:w:${DIR_BOOTLOADER}/${BOOTLOADER_NAME}:i
+  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -Uflash:w:${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC}:i
+  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -B 0.5 -Uflash:w:${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC}:i
 
   echo
-  echo "Successfully ${DIR_BOOTLOADER}/${BOOTLOADER_NAME} flashed for ATmega${MCU_UPPER}."
+  echo "Successfully ${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC} flashed for ATmega${MCU_UPPER}."
 #fi
