@@ -275,30 +275,28 @@ DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
 #  mkdir "${DIR_REL_BUILD_PATH}"
 #fi
 
-<< COMMENTOUT
-if [ -n "${FW_ARG}" ]; then
-  if [ -n "$flg_recompile" ] || [ ! -e "${REL_HEX_FILE}" ]; then
-    echo "Compile firmware w/bootloader for ATmega${MCU_UPPER}."
-
-    if [ -e "${DIR_REL_BUILD_PATH}/libraries" ]; then
-      rm -r "${DIR_REL_BUILD_PATH}/libraries"
-    fi
-    if [ -e "${DIR_REL_BUILD_PATH}/core" ]; then
-      rm -r "${DIR_REL_BUILD_PATH}/core"
-    fi
-    DIR_ABS_BUILD_PATH=$(cd $DIR_REL_BUILD_PATH && pwd)
-
-    # Compile
-    #echo arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-    arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-    #echo arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-    arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-  else
-    echo "Skip firmware compilation."
-  fi
-
-  echo "Flash firmware w/bootloader to ATmega${MCU_UPPER}."
-COMMENTOUT
+#if [ -n "${FW_ARG}" ]; then
+#  if [ -n "$flg_recompile" ] || [ ! -e "${REL_HEX_FILE}" ]; then
+#    echo "Compile firmware w/bootloader for ATmega${MCU_UPPER}."
+#
+#    if [ -e "${DIR_REL_BUILD_PATH}/libraries" ]; then
+#      rm -r "${DIR_REL_BUILD_PATH}/libraries"
+#    fi
+#    if [ -e "${DIR_REL_BUILD_PATH}/core" ]; then
+#      rm -r "${DIR_REL_BUILD_PATH}/core"
+#    fi
+#    DIR_ABS_BUILD_PATH=$(cd $DIR_REL_BUILD_PATH && pwd)
+#
+#    # Compile
+#    #echo arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
+#    arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
+#    #echo arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
+#    arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
+#  else
+#    echo "Skip firmware compilation."
+#  fi
+#
+#  echo "Flash firmware w/bootloader to ATmega${MCU_UPPER}."
 
   # Preserve EEPROM
   #if [ ! -n "$flg_fuse" ]; then
