@@ -9,7 +9,7 @@ a-star328PB.upload.maximum_data_size=2048
 
 a-star328PB.bootloader.tool=avrdudecustom
 a-star328PB.bootloader.low_fuses=0xFF
-a-star328PB.bootloader.high_fuses=0xDE
+a-star328PB.bootloader.high_fuses=0xD2
 a-star328PB.bootloader.unlock_bits=0xFF
 a-star328PB.bootloader.lock_bits=0xCF
 
@@ -42,6 +42,15 @@ a-star328PB.menu.version.8mhz.upload.speed=57600
 a-star328PB.menu.version.8mhz.bootloader.extended_fuses=0xF5
 a-star328PB.menu.version.8mhz.bootloader.file=optiboot/optiboot_atmega328pb_8mhz.hex
 a-star328PB.menu.version.8mhz.build.f_cpu=8000000L
+
+##############################################################
+
+a-star328PB.menu.version.8mhzB=3.3V, 8MHz, 7800boot
+a-star328PB.menu.version.8mhzB.upload.speed=57600
+a-star328PB.menu.version.8mhzB.bootloader.extended_fuses=0xF5
+a-star328PB.menu.version.8mhzB.bootloader.high_fuses=0xD2
+a-star328PB.menu.version.8mhzB.bootloader.file=optiboot/optiboot_atmega328pb7800_8mhz.hex
+a-star328PB.menu.version.8mhzB.build.f_cpu=8000000L
 
 ##############################################################
 
