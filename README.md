@@ -1,11 +1,17 @@
-# How to build bootloader for ATmega328PB on Windows
+# How to build bootloader
 ```
-cd bootloaders/optiboot
-mingw32-make.exe clean
-mingw32-make.exe atmega328pb_8mhz
-cp optiboot_atmega328pb_8mhz.hex ${USERPROFILE}/AppData/Local/Arduino15/packages/pololu-a-star/hardware/avr/4.0.2/bootloaders/optiboot
+sh bl_build_win.sh
+```
+# How to flash bootloader
+```
+sh bl_flasher_win.sh -p 4
 ```
 
+<br>
+<br>
+<br>
+<br>
+<br>
 # Pololu A-Star Software and Drivers
 
 Version: 4.0.2<br>
