@@ -135,10 +135,10 @@
 #else
 /* Onboard LED is connected to pin PB5 in Arduino NG, Diecimila, and Duomilanuove */ 
 /* other boards like e.g. Crumb8, Crumb168 are using PB2 */
-#define LED_DDR  DDRB
-#define LED_PORT PORTB
-#define LED_PIN  PINB
-#define LED      PINB5
+#define LED_DDR  DDRD
+#define LED_PORT PORTD
+#define LED_PIN  PIND
+#define LED      PIND6
 #endif
 
 
@@ -419,6 +419,12 @@ int main(void)
 	/* set LED pin as output */
 	LED_DDR |= _BV(LED);
 
+  // PIN_EN_TX to low
+  DDRB |= _BV(PINB0);
+  PORTB &= ~_BV(PINB0);
+  // PIN_EN_RX to high
+  DDRD |= _BV(PIND7);
+  PORTD |= _BV(PIND7);
 
 	/* flash onboard LED to signal entering of bootloader */
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
@@ -922,6 +928,8 @@ void puthex(char ch) {
 
 void putch(char ch)
 {
+  // PIN_EN_TX to high
+  PORTB |= _BV(PINB0);
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	if(bootuart == 1) {
 		while (!(UCSR0A & _BV(UDRE0)));
