@@ -428,6 +428,8 @@ int main(void)
   DDRD |= _BV(PIND7);
   PORTD |= _BV(PIND7);
 
+	putch('#');
+
 	/* flash onboard LED to signal entering of bootloader */
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	// 4x for UART0, 5x for UART1
@@ -882,6 +884,7 @@ int main(void)
 	/* end of monitor */
 #endif
 	else if (++error_count == MAX_ERROR_COUNT) {
+		putch('E');
 		app_start();
 	}
 	} /* end of forever loop */
@@ -985,8 +988,10 @@ char getch(void)
 		/* 20060803 DojoCorp:: Addon coming from the previous Bootloader*/               
 		/* HACKME:: here is a good place to count times*/
 		count++;
-		if (count > MAX_TIME_COUNT)
+		if (count > MAX_TIME_COUNT) {
+			putch('T');
 			app_start();
+		}
 	}
 	return UDR0;
 #else
