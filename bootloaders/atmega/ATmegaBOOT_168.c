@@ -7,6 +7,8 @@
 /* ATmegaBOOT.c                                           */
 /*                                                        */
 /*                                                        */
+/* 20181212: implimented EN_TX EN_RX operation and LED    */
+/*           pin change for VIVITA custom HW by T. Hayashi*/
 /* 20090308: integrated Mega changes into main bootloader */
 /*           source by D. Mellis                          */
 /* 20080930: hacked for Arduino Mega (with the 1280       */
