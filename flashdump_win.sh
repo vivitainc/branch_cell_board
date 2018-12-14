@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v1.1 for 328pb"
+VERSION="${PROGNAME} v1.2 for 328pb"
 echo
 echo ${VERSION}
 echo
@@ -310,8 +310,10 @@ DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
   if [ ! -e "${DUMP_DIR}" ]; then
     mkdir "${DUMP_DIR}"
   fi
-  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${DUMP_DIR}/${INO_DIR_NAME}.dump:i
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${DUMP_DIR}/${INO_DIR_NAME}.dump:i
+  echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${FW_ARG}.dump:i
+  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${FW_ARG}.dump:i
+  echo python hex_converter.py ${FW_ARG}.dump ${FW_ARG}
+  python hex_converter16.py ${FW_ARG}.dump ${FW_ARG}
   echo
-  echo "Successfully ${DUMP_DIR}/${INO_DIR_NAME}.dump retrieved for ATmega${MCU_UPPER}."
+  echo "Successfully ${FW_ARG} retrieved for ATmega${MCU_UPPER}."
 #fi
