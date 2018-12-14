@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v3.0"
+VERSION="${PROGNAME} v4.0"
 echo
 echo ${VERSION}
 echo
@@ -9,15 +9,15 @@ echo
 DEFAULT_MICRO=328p
 MICRO_OPTION="328p or 328pb"
 
-DIR_BOOTLOADER_328P=bootloaders\\atmega
+DIR_BOOTLOADER_328P=bootloaders/atmega
 BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz.hex
-BOOTLOADER_NAME_328P_DST=optiboot_atmega328pb7800_8mhz.hex
+BOOTLOADER_NAME_328P_DST=ATmegaBOOT_168_atmega328_pro_8MHz.hex
 MAKE_OPTION_328P=atmega328_pro8
 
-DIR_BOOTLOADER_328PB=bootloaders\\optiboot
-BOOTLOADER_NAME_328PB_SRC=optiboot_atmega328pb_8mhz.hex
-BOOTLOADER_NAME_328PB_DST=optiboot_atmega328pb7800_8mhz.hex
-MAKE_OPTION_328PB=atmega328pb_8mhz
+DIR_BOOTLOADER_328PB=bootloaders/atmega
+BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
+BOOTLOADER_NAME_328PB_DST=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
+MAKE_OPTION_328PB=atmega328_pro8_pb
 
 BASEDIR=$(cd $(dirname $0); pwd)
 #echo ${BASEDIR}
@@ -28,7 +28,8 @@ function Usage() {
   echo 
   echo "Option: One of the options must be required"
   echo "  -h, --help              Help"
-  echo "  -t, --target <mcu_name> Specify the target bootloader ${MICRO_OPTION}"
+  echo "  -c, --clean             Clean"
+  echo "  -m, --mcu <mcu_name>    Specify the target bootloader ${MICRO_OPTION}"
   echo
   exit 1
 }
@@ -39,7 +40,7 @@ for opt in "$@"; do
     '-h' | '--help' )
       Usage
       ;;
-    '-t' | '--target' )
+    '-m' | '--mcu' )
       # target bootloader
       if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
         echo "${PROGNAME}: $1 option requires an argument" 1>&2
@@ -48,6 +49,10 @@ for opt in "$@"; do
       fi
       BL_ARG=("$2")
       shift 2
+      ;;
+    '-c' | '--clean' )
+      CLEAN_FLAG=1
+      shift
       ;;
     -* )
       echo "${PROGNAME}: $1 illegal option" 1>&2
@@ -84,17 +89,24 @@ else
   exit 1
 fi
 
+if [ -n "${CLEAN_FLAG}" ]; then
+  cd ${FIXED_DIR_BOOTLOADER}
+  echo make clean
+  make clean
+  exit 0
+fi
+
 # Make
 cd ${FIXED_DIR_BOOTLOADER}
-make clean
 echo make ${FIXED_MAKE_OPTION}
 make ${FIXED_MAKE_OPTION}
-cp ${FIXED_BOOTLOADER_NAME_SRC} ${USERPROFILE}/AppData/Local/Arduino15/packages/pololu-a-star/hardware/avr/4.0.2/bootloaders/optiboot/${FIXED_BOOTLOADER_NAME_DST}
+cp ${FIXED_BOOTLOADER_NAME_SRC} ${USERPROFILE}/AppData/Local/Arduino15/packages/pololu-a-star/hardware/avr/4.0.2/${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_DST}
 cd ../../
 
 echo
 echo Built ${FIXED_BOOTLOADER_NAME_SRC} in ${FIXED_DIR_BOOTLOADER}
-echo Copied ${FIXED_BOOTLOADER_NAME_SRC} to ${USERPROFILE}/AppData/Local/Arduino15/packages/pololu-a-star/hardware/avr/4.0.2/bootloaders/optiboot/${FIXED_BOOTLOADER_NAME_DST}
+echo Copied ${FIXED_BOOTLOADER_NAME_SRC} to ${USERPROFILE}/AppData/Local/Arduino15/packages/pololu-a-star/hardware/avr/4.0.2/${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_DST}
+echo Build finished for ATmega${BL_UPPER}
 
 exit 0
 
