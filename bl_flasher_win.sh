@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v3.0 for 328pb"
+VERSION="${PROGNAME} v4.1"
 echo
 echo ${VERSION}
 echo
@@ -31,21 +31,23 @@ CONF1_DEFAULT_FILE=${DIR_ARDUINO}\\hardware\\tools\\avr\\etc\\avrdude.conf
 CONF1_USR_FILE=${DIR_USER2}\\arduino\\tools\\avrdude\\6.3.0-arduino9\\etc\\avrdude.conf
 CONF2_FILE=${DIR_USER2}\\pololu-a-star\\hardware\\avr\\4.0.2\\extra_avrdude.conf
 
+DIR_STANDARD_BOARD=${DIR_ARDUINO}\\hardware\\arduino\\avr
+DIR_POLOLU_BOARD=${USERPROFILE}\\AppData\\Local\\Arduino15\\packages\\pololu-a-star\\hardware\\avr\\4.0.2
+
 DIR_INO_ROOT=examples
 DIR_BUILD=build
 FW_ARG=flash
 
-DIR_BOOTLOADER_328P=bootloaders\\atmega
-BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+DIR_BOOTLOADER_328P=bootloaders/atmega
+BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 
-DIR_BOOTLOADER_328PB=bootloaders\\optiboot
-BOOTLOADER_NAME_328PB_SRC=optiboot_atmega328pb_8mhz.hex
+DIR_BOOTLOADER_328PB=bootloaders/atmega
+BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
 
 FW_HEX_SUFFIX="ino.with_bootloader.hex"
 BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
-BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzB"
-DEFAULT_BOOTLOADER=328p
-DEFAULT_MICRO=328pb
+BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzVivita"
+DEFAULT_MICRO=328p
 MICRO_OPTION="328p or 328pb"
 
 HARDWARE="-hardware "${DIR_HARDWARE1}
@@ -77,7 +79,6 @@ function Usage() {
   echo "Option: -p option must be required"
   echo "  -h                         Help"
   echo "  -p <port number or name>   Port number or name to Arduino ISP"
-  echo "  -t <mcu_name>              Specify the target bootloader ${MICRO_OPTION}"
   echo "  -m <mcu_name>              Specify the target MCU ${MICRO_OPTION}"
   echo
   exit 1
@@ -114,16 +115,6 @@ while(( $# > 0 )); do
             shift
             break
             ;;
-          't')
-            # target bootloader
-            if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-              echo "${PROGNAME}: $1 option requires an argument" 1>&2
-              echo "Provide ${MICRO_OPTION}" 1>&2
-              exit 1
-            fi
-            BL_ARG=("$2")
-            shift
-            ;;
           'm')
             # mcu must need an arg
             if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
@@ -146,25 +137,6 @@ while(( $# > 0 )); do
   shift
 done
 
-# Verify ${BL_ARG} and define ${FIXED_DIR_BOOTLOADER} and ${FIXED_BOOTLOADER_NAME_SRC} and ${FIXED_BOOTLOADER_NAME_DST} and ${FIXED_MAKE_OPTION}
-if [ ! -n "${BL_ARG}" ]; then
-  BL_TYPE=${DEFAULT_BOOTLOADER}
-else
-  BL_TYPE=${BL_ARG}
-fi
-BL_UPPER=`echo ${BL_TYPE} | tr '[a-z]' '[A-Z]'`
-if [ "${BL_UPPER}" = "328P" ]; then
-  FIXED_DIR_BOOTLOADER=${DIR_BOOTLOADER_328P}
-  FIXED_BOOTLOADER_NAME_SRC=${BOOTLOADER_NAME_328P_SRC}
-elif [ "${BL_UPPER}" = "328PB" ]; then
-  FIXED_DIR_BOOTLOADER=${DIR_BOOTLOADER_328PB}
-  FIXED_BOOTLOADER_NAME_SRC=${BOOTLOADER_NAME_328PB_SRC}
-else
-  echo "Cannot recognize -t argument ${BL_ARG}" 1>&2
-  echo "Provide ${MICRO_OPTION}" 1>&2
-  exit 1
-fi
-
 # If ${CONF1_USR_FILE} does not exist, use ${CONF1_DEFAULT_FILE} instead
 if [ ! -e "${CONF1_USR_FILE}" ]; then
   CONF1_FILE=${CONF1_DEFAULT_FILE}
@@ -184,9 +156,13 @@ MCU_UPPER=`echo ${MCU_TYPE} | tr '[a-z]' '[A-Z]'`
 if [ "${MCU_UPPER}" = "328P" ]; then
   BOARD_NAME=${BOARD_328P_NAME}
   CONF_OPTION="-C ${CONF1_FILE}"
+  FIXED_DIR_BOOTLOADER=${DIR_BOOTLOADER_328P}
+  FIXED_BOOTLOADER_NAME_SRC=${BOOTLOADER_NAME_328P_SRC}
 elif [ "${MCU_UPPER}" = "328PB" ]; then
   BOARD_NAME=${BOARD_328PB_NAME}
   CONF_OPTION="-C ${CONF1_FILE} -C +${CONF2_FILE}"
+  FIXED_DIR_BOOTLOADER=${DIR_BOOTLOADER_328PB}
+  FIXED_BOOTLOADER_NAME_SRC=${BOOTLOADER_NAME_328PB_SRC}
 else
   echo "Cannot recognize -m argument ${MCU_ARG}"
   echo "Provide ${MICRO_OPTION}"
