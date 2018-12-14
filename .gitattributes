@@ -1,3 +1,7 @@
+* text=auto
+*.hex text
+*.lst text
+*.log text
 *.inf -text
 *.txt text eol=crlf
 *.md test eol=crlf

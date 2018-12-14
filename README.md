@@ -1,3 +1,17 @@
+# How to build bootloader
+```
+sh bl_build_win.sh
+```
+# How to flash bootloader
+```
+sh bl_flasher_win.sh -p 4
+```
+
+<br>
+<br>
+<br>
+<br>
+<br>
 # Pololu A-Star Software and Drivers
 
 Version: 4.0.2<br>
