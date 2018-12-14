@@ -233,6 +233,11 @@
 #define PAGE_SIZE	0x20U	//32 words
 #endif
 
+// ATmega328PB signature byte
+#ifdef REALLY_328PB
+#undef SIG3
+#define SIG3 0x16
+#endif
 
 /* function prototypes */
 void putch(char);
