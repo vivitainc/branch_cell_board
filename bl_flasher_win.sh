@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v4.0"
+VERSION="${PROGNAME} v4.1"
 echo
 echo ${VERSION}
 echo
@@ -31,12 +31,15 @@ CONF1_DEFAULT_FILE=${DIR_ARDUINO}\\hardware\\tools\\avr\\etc\\avrdude.conf
 CONF1_USR_FILE=${DIR_USER2}\\arduino\\tools\\avrdude\\6.3.0-arduino9\\etc\\avrdude.conf
 CONF2_FILE=${DIR_USER2}\\pololu-a-star\\hardware\\avr\\4.0.2\\extra_avrdude.conf
 
+DIR_STANDARD_BOARD=${DIR_ARDUINO}\\hardware\\arduino\\avr
+DIR_POLOLU_BOARD=${USERPROFILE}\\AppData\\Local\\Arduino15\\packages\\pololu-a-star\\hardware\\avr\\4.0.2
+
 DIR_INO_ROOT=examples
 DIR_BUILD=build
 FW_ARG=flash
 
 DIR_BOOTLOADER_328P=bootloaders/atmega
-BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz.hex
+BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 
 DIR_BOOTLOADER_328PB=bootloaders/atmega
 BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex

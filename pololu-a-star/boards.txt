@@ -49,7 +49,7 @@ a-star328PB.menu.version.8mhzVivita=3.3V, 8MHz, Viviparts
 a-star328PB.menu.version.8mhzVivita.upload.speed=57600
 a-star328PB.menu.version.8mhzVivita.bootloader.extended_fuses=0xF5
 a-star328PB.menu.version.8mhzVivita.bootloader.high_fuses=0xD2
-a-star328PB.menu.version.8mhzVivita.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz_viviparts.hex
+a-star328PB.menu.version.8mhzVivita.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
 a-star328PB.menu.version.8mhzVivita.build.f_cpu=8000000L
 
 ##############################################################
