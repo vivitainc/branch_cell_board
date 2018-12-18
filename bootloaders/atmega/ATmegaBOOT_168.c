@@ -7,8 +7,8 @@
 /* ATmegaBOOT.c                                           */
 /*                                                        */
 /*                                                        */
-/* 20181214: added 328pb support and VIVIPARTS GPIO       */
-/*           operation by T.Hayashi VIVITA Inc.           */
+/* 20181218: added signature read support and VIVIPARTS   */
+/*           GPIO operation by T.Hayashi VIVITA Inc.      */
 /* 20090308: integrated Mega changes into main bootloader */
 /*           source by D. Mellis                          */
 /* 20080930: hacked for Arduino Mega (with the 1280       */
