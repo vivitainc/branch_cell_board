@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v4.1"
+VERSION="${PROGNAME} v4.2"
 echo
 echo ${VERSION}
 echo
@@ -19,9 +19,9 @@ BOOTLOADER_NAME_328P_DST=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 MAKE_OPTION_328P=atmega328_pro8
 
 DIR_BOOTLOADER_328PB=bootloaders/atmega
-BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
-BOOTLOADER_NAME_328PB_DST=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
-MAKE_OPTION_328PB=atmega328_pro8_pb
+BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
+BOOTLOADER_NAME_328PB_DST=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
+MAKE_OPTION_328PB=atmega328_pro8
 
 BASEDIR=$(cd $(dirname $0); pwd)
 #echo ${BASEDIR}
