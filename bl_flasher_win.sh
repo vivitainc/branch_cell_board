@@ -1,7 +1,7 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v4.1"
+VERSION="${PROGNAME} v4.2"
 echo
 echo ${VERSION}
 echo
@@ -42,7 +42,7 @@ DIR_BOOTLOADER_328P=bootloaders/atmega
 BOOTLOADER_NAME_328P_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 
 DIR_BOOTLOADER_328PB=bootloaders/atmega
-BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_pb.hex
+BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 
 FW_HEX_SUFFIX="ino.with_bootloader.hex"
 BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
@@ -80,6 +80,7 @@ function Usage() {
   echo "  -h                         Help"
   echo "  -p <port number or name>   Port number or name to Arduino ISP"
   echo "  -m <mcu_name>              Specify the target MCU ${MICRO_OPTION}"
+  echo "  -F                         Force flash in avrdude even if device signature is invalid"
   echo
   exit 1
 }
@@ -124,6 +125,11 @@ while(( $# > 0 )); do
             fi
             MCU_ARG=("$2")
             shift
+            break
+            ;;
+          'F')
+            # avrdude -F
+            FORCE_OPTION="-F"
             break
             ;;
           esac
