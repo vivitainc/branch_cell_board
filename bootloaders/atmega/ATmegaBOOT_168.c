@@ -7,6 +7,8 @@
 /* ATmegaBOOT.c                                           */
 /*                                                        */
 /*                                                        */
+/* 20190118: turned off watchdog to avoid reiterate reset */
+/*           if wd trigger in app by T.Hayashi VIVITA Inc.*/
 /* 20181218: added signature read support and VIVIPARTS   */
 /*           GPIO operation by T.Hayashi VIVITA Inc.      */
 /* 20090308: integrated Mega changes into main bootloader */
