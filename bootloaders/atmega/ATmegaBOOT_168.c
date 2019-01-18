@@ -437,12 +437,14 @@ int main(void)
 	/* set LED pin as output */
 	LED_DDR |= _BV(LED);
 
+#if defined(VPARTS_EN_TX_RX_OPERATION)
 	// PIN_EN_TX to low
 	DDRB |= _BV(PINB0);
 	PORTB &= ~_BV(PINB0);
 	// PIN_EN_RX to high
 	DDRD |= _BV(PIND7);
 	PORTD |= _BV(PIND7);
+#endif
 
 	/* flash onboard LED to signal entering of bootloader */
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
@@ -950,8 +952,10 @@ void puthex(char ch) {
 
 void putch(char ch)
 {
+#if defined(VPARTS_EN_TX_RX_OPERATION)
 	// PIN_EN_TX to high
 	PORTB |= _BV(PINB0);
+#endif
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	if(bootuart == 1) {
 		while (!(UCSR0A & _BV(UDRE0)));
