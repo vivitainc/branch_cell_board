@@ -6,7 +6,7 @@ echo
 echo ${VERSION}
 echo
 
-DEFAULT_MICRO=328p
+DEFAULT_MICRO=328pb
 MICRO_OPTION="328p or 328pb"
 
 DIR_ARDUINO="C:\PROGRA~2\Arduino"
