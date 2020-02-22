@@ -728,7 +728,6 @@ int main(void)
 			}
 			putch(0x14);
 			putch(0x10);
-			GPIOR0 |= 0x1;
 		} else {
 			if (++error_count == MAX_ERROR_COUNT)
 				app_start();
