@@ -1,3 +1,7 @@
+# Prerequisites
+
+- Arduino IDE v1.8.7 for Windows
+
 # How to build bootloader
 ```
 sh bl_build_win.sh
