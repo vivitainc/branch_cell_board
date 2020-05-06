@@ -47,7 +47,7 @@ BOOTLOADER_NAME_328PB_SRC=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 FW_HEX_SUFFIX="ino.with_bootloader.hex"
 BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
 BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzVivita"
-DEFAULT_MICRO=328p
+DEFAULT_MICRO=328pb
 MICRO_OPTION="328p or 328pb"
 
 HARDWARE="-hardware "${DIR_HARDWARE1}
