@@ -1,3 +1,7 @@
+# Prerequisites
+
+- Arduino IDE v1.8.7 for Windows
+
 # How to build bootloader
 ```
 sh bl_build_win.sh
@@ -7,11 +11,15 @@ sh bl_build_win.sh
 sh bl_flasher_win.sh -p 4
 ```
 
+# Prerequisites for bootloader build
+Need installation of tools/WinAVR-20100110-install.exe on Windows machine and update PATH environment variable. (ex. `C:¥WinAVR-20100110¥bin;C:¥WinAVR-20100110¥utils¥bin;$PATH` )
+
 <br>
 <br>
 <br>
 <br>
 <br>
+
 # Pololu A-Star Software and Drivers
 
 Version: 4.0.2<br>
