@@ -7,6 +7,8 @@
 /* ATmegaBOOT.c                                           */
 /*                                                        */
 /*                                                        */
+/* 20200121: GPIO0 |= 1 to notify firmware app            */
+/*           if reset condition is watchdog               */
 /* 20190118: turned off watchdog to avoid reiterate reset */
 /*           if wd trigger in app by T.Hayashi VIVITA Inc.*/
 /* 20181218: added signature read support and VIVIPARTS   */
