@@ -1,44 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v1.2 for 328pb"
+VERSION="${PROGNAME} v4.1"
 echo
 echo ${VERSION}
 echo
 BASEDIR=$(dirname $0)
 #echo BASEDIR=${BASEDIR}
 
-PORT_PREFIX=COM
-ISP_DEV_NAME=
-
-DIR_ARDUINO="C:\PROGRA~2\Arduino"
-DIR_USER=${USERPROFILE}\\Documents\\Arduino
-DIR_USER2=${USERPROFILE}\\AppData\\Local\\Arduino15\\packages
-DIR_CURRENT=${PWD}
-DIR_ARDUINO_BIN=${DIR_ARDUINO}\\hardware\\tools\\avr\\bin
-
-DIR_HARDWARE1=${DIR_ARDUINO}\\hardware
-DIR_HARDWARE2=${DIR_USER}\\hardware
-DIR_HARDWARE3=${DIR_USER2}
-
-DIR_TOOLS1=${DIR_ARDUINO}\\tools-builder
-DIR_TOOLS2=${DIR_ARDUINO}\\hardware\\tools\\avr
-DIR_TOOLS3=${DIR_USER2}
-
-DIR_BUILTIN_LIB=${DIR_ARDUINO}\\libraries
-DIR_LIB=${DIR_USER}\\libraries
-CONF1_DEFAULT_FILE=${DIR_ARDUINO}\\hardware\\tools\\avr\\etc\\avrdude.conf
-CONF1_USR_FILE=${DIR_USER2}\\arduino\\tools\\avrdude\\6.3.0-arduino9\\etc\\avrdude.conf
-CONF2_FILE=${DIR_USER2}\\pololu-a-star\\hardware\\avr\\4.0.2\\extra_avrdude.conf
+ENV_DIR="${BASEDIR}/../envs"
+source "${ENV_DIR}/env.sh"
 
 DIR_INO_ROOT=examples
 DIR_BUILD=build
 
 FW_HEX_SUFFIX="ino.with_bootloader.hex"
-BOARD_328P_NAME="arduino:avr:vivi:cpu=8MHzatmega328"
-BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhz"
+BOARD_328P_NAME="arduino:avr:vivi:cpu=Viviboot8MHz"
+BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzVivita"
 DEFAULT_MICRO=328pb
-MICRO_OPTION="328p or 328pb"
 
 HARDWARE="-hardware "${DIR_HARDWARE1}
 
@@ -62,23 +41,35 @@ fi
 
 export PATH="${DIR_ARDUINO_BIN}:${DIR_ARDUINO}:$PATH"
 
+function ErrorMsg() {
+  echo
+  echo "Error occurred. Try again!"
+  echo
+  exit 1
+}
+
 function Usage() {
   echo 
   echo "Usage: ${PROGNAME} [Options]"
   echo 
-  echo "Option: -p option must be required"
+  echo "Option: -p option must be required for Windows"
   echo "  -h                         Help"
   echo "  -p <port number or name>   Port number or name to Arduino ISP"
-  echo "  -b                         Set fuse bit"
-  echo "  -u <max 6byte, hex>        Write 6byte unique id to EEPROM"
+  echo "  -b                         Set fuse bit, write BRANCH_TYPE into EEPROM"
   echo "  -f <sketch name>           Flash firmware w/ arduino bootloader"
   echo "  -r                         Force recompile (also require -f option)"
-  echo "  -m <mcu_name>              Specify the target MCU ${MICRO_OPTION}"
   echo "  -F                         Force flash in avrdude even if device signature is invalid"
   echo
   exit 1
 }
 
+function GetBranchType() {
+  local ino_file=${1}
+  local branchtype_line=$(grep -E "^const\s+uint32_t\s+BRANCH_TYPE" ${ino_file})
+  local branchtype=$(echo "${branchtype_line}" | sed -e 's|^.*BRANCH_TYPE *= *0x\([0-9a-fA-F]\{1,\}\);.*|\1|')
+
+  echo ${branchtype}
+}
 
 if [ $# = 0 ]; then
   Usage
@@ -111,17 +102,6 @@ while(( $# > 0 )); do
             shift
             break
             ;;
-          'u')
-            # unique id
-            uid=("$2")
-            if [ ${#uid} -lt 2 ] || [ ${#uid} -gt 12 ]; then
-              echo "-u: Invalid argument"
-              echo "${uid}"
-              exit
-            fi
-            shift
-            break
-            ;;
           'b')
             # Fuse bit, Lock bit etc.
             flg_fuse=1
@@ -143,17 +123,6 @@ while(( $# > 0 )); do
             shift
             break
             ;;
-          'm')
-            # mcu must need an arg
-            if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
-              echo "${PROGNAME}: -$1 option requires an argument"
-              echo "Provide ${MICRO_OPTION}"
-              exit
-            fi
-            MCU_ARG=("$2")
-            shift
-            break
-            ;;
           esac
         done
       ;;
@@ -172,39 +141,26 @@ else
   CONF1_FILE=${CONF1_USR_FILE}
 fi
 
-# Verify ${MCU_ARG} and define ${BOARD_NAME}, ${CONF_OPTION}, ${MCU_LOWER}, ${MCU_UPPER}
-if [ ! -n "${MCU_ARG}" ]; then
-  # If not provide -m option, use ${DEFAULT_MICRO}
-  MCU_TYPE=${DEFAULT_MICRO}
-else
-  MCU_TYPE=${MCU_ARG}
-fi
+MCU_TYPE=${DEFAULT_MICRO}
 MCU_LOWER=`echo ${MCU_TYPE} | tr '[A-Z]' '[a-z]'`
 MCU_UPPER=`echo ${MCU_TYPE} | tr '[a-z]' '[A-Z]'`
-if [ "${MCU_UPPER}" = "328P" ]; then
-  BOARD_NAME=${BOARD_328P_NAME}
-  CONF_OPTION="-C ${CONF1_FILE}"
-elif [ "${MCU_UPPER}" = "328PB" ]; then
-  BOARD_NAME=${BOARD_328PB_NAME}
-  CONF_OPTION="-C ${CONF1_FILE} -C +${CONF2_FILE}"
-else
-  echo "Cannot recognize -m argument ${MCU_ARG}"
-  echo "Provide ${MICRO_OPTION}"
-  exit
-fi
-#echo "MCU_ARG=${MCU_ARG}"
+BOARD_NAME=${BOARD_328PB_NAME}
+FIXED_SRC_BOOTLOADER_FILE=${SRC_BOOTLOADER_328PB_FILE}
+FIXED_DST_BOOTLOADER_DIR=${DST_BOOTLOADER_328PB_DIR}
+FIXED_DST_BOOTLOADER_FILE=${DST_BOOTLOADER_328PB_FILE}
+
 #echo "BOARD_NAME=${BOARD_NAME}"
-#echo "CONF_OPTION=${CONF_OPTION}"
 #echo "MCU_LOWER=${MCU_LOWER}"
 #echo "MCU_UPPER=${MCU_UPPER}"
 
-# Analysis ${FW_ARG} and create ${INO_DIR_NAME}, ${REL_HEX_FILE} and ${REL_INO_FILE}
+# Analysis ${FW_ARG} and create ${INO_DIR_NAME}, ${DIR_INO_ROOT}, ${REL_HEX_FILE} and ${REL_INO_FILE}
 if [ -n "${FW_ARG}" ]; then
   if [ -e "${FW_ARG}" ]; then
     if [ -f "${FW_ARG}" ] && [ ${FW_ARG##*.} = ino ]; then
       # If ${FW_ARG} is ino file full path
       INO_FILE_NAME=${FW_ARG##*/}
       INO_DIR_NAME=${INO_FILE_NAME%.*}
+      DIR_INO_ROOT=${FW_ARG%%/*}
       REL_HEX_FILE="${FW_ARG%/*.ino}/${DIR_BUILD}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}"
       REL_INO_FILE="${FW_ARG}"
       #echo "${FW_ARG} = ino file full path"
@@ -212,6 +168,7 @@ if [ -n "${FW_ARG}" ]; then
       # If ${FW_ARG} is hex file full path
       INO_FILE_NAME=${FW_ARG##*/}
       INO_DIR_NAME=${INO_FILE_NAME%%.*}
+      DIR_INO_ROOT=${FW_ARG%%/*}
       REL_HEX_FILE="${FW_ARG}"
       REL_BUILD_DIR="${FW_ARG%/*}"
       REL_INO_FILE="${REL_BUILD_DIR%/${DIR_BUILD}}/${INO_DIR_NAME}.ino"
@@ -219,6 +176,7 @@ if [ -n "${FW_ARG}" ]; then
     else
       # If ${FW_ARG} is ino directory full path
       INO_DIR_NAME=`basename ${FW_ARG}`
+      DIR_INO_ROOT=${FW_ARG%%/*}
       REL_HEX_FILE="${FW_ARG}/${DIR_BUILD}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}"
       REL_INO_FILE="${FW_ARG}/${INO_DIR_NAME}.ino"
       #echo "${FW_ARG} = ino directory path"
@@ -233,6 +191,16 @@ if [ -n "${FW_ARG}" ]; then
   #echo "INO_DIR_NAME=${INO_DIR_NAME}"
   #echo "REL_HEX_FILE=${REL_HEX_FILE}"
   #echo "REL_INO_FILE=${REL_INO_FILE}"
+fi
+
+#echo "DIR_INO_ROOT=${DIR_INO_ROOT}"
+
+if [ -z "$com" ] && [ ${#ISP_DEV_NAMES[@]} -gt 1 ]; then
+  echo "Error: -p option must be required with one of below devices"
+  echo "$(for DEV in ${ISP_DEV_NAMES[@]}; do echo "  ${DEV}"; done)"
+  exit 1
+else
+  ISP_DEV_NAME=${ISP_DEV_NAMES[0]}
 fi
 
 # Overwrite $com if ${ISP_DEV_NAME} is not empty
@@ -251,7 +219,6 @@ fi
 MCU      : ${MCU_UPPER}
 OPTION-F : ${FORCE_OPTION}
 PORT     : ${PORT_PREFIX}${com}
-UID      : $uid
 FIRMWARE : $INO_DIR_NAME
 FUSE     : $flg_fuse
 -----------------------------
@@ -267,21 +234,31 @@ fi
 
 if [ -n "$flg_fuse" ]; then
   echo "Write Fuse bit etc to ATmega${MCU_UPPER}."
-  #echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xFD:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xFD:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+  #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+  avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
 
-fi
+  if [ -n "${FW_ARG}" ]; then
+    echo "Write BRANCH_TYPE into ATmega${MCU_UPPER} EEPROM."
+    # Get BRANCH_TYPE
+    readonly BRANCH_TYPE=$(GetBranchType ${REL_INO_FILE})
+    echo BRANCH_TYPE=0x${BRANCH_TYPE}
 
-if [ -n "$uid" ]; then
-  echo "Write UNIQUE ID to EEPROM to ATmega${MCU_UPPER}."
-  # Generate Hex file
-  python ${BASEDIR}/hex_generator.py $uid
-  # Flash unique id to EEPROM
-  #echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/eeprom.hex:i
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/eeprom.hex:i
-  # Verify
-  #echo "Verify the UNIQUE ID."
-  #avrdude ${CONF_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:r:verify.hex:i
+    # Generate Hex file
+    python ${BASEDIR}/hex_generator.py ${BRANCH_TYPE} ${EEPROM_HEX_FILE}
+    if [ $? -ne 0 ]; then
+      echo
+      echo 'May need python installation and "pip install IntelHex"'
+      ErrorMsg
+    fi
+
+    # Flash BRANCH_TYPE to EEPROM
+    #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/${EEPROM_HEX_FILE}:i
+    avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/${EEPROM_HEX_FILE}:i
+    rm ${BASEDIR}/${EEPROM_HEX_FILE}
+    # Verify
+    #echo "Verify BRANCH_TYPE."
+    #avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:r:${BASEDIR}/verify.hex:i
+  fi
 fi
 
 DIR_INO_PATH=${DIR_INO_ROOT}/${INO_DIR_NAME}
@@ -302,6 +279,13 @@ if [ -n "${FW_ARG}" ]; then
     fi
     DIR_ABS_BUILD_PATH=$(cd $DIR_REL_BUILD_PATH && pwd)
 
+    # Copy bootloader to ${FIXED_DST_BOOTLOADER_DIR}
+    if [ ! -e "${FIXED_DST_BOOTLOADER_DIR}" ]; then
+      mkdir -p ${FIXED_DST_BOOTLOADER_DIR}
+    fi
+    echo cp "${FIXED_SRC_BOOTLOADER_FILE}" "${FIXED_DST_BOOTLOADER_DIR}/${FIXED_DST_BOOTLOADER_FILE}"
+    cp "${FIXED_SRC_BOOTLOADER_FILE}" "${FIXED_DST_BOOTLOADER_DIR}/${FIXED_DST_BOOTLOADER_FILE}"
+
     # Compile
     #echo arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
     arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
@@ -313,15 +297,22 @@ if [ -n "${FW_ARG}" ]; then
 
   echo "Flash firmware w/bootloader to ATmega${MCU_UPPER}."
 
+  # Copy ${SRC_BOARD_TXT_328PB_POLOLU} to ${DST_BOARD_TXT_328PB_POLOLU}
+  if [ "${MCU_UPPER}" = "328PB" ]; then
+    cp "${SRC_BOARD_TXT_328PB_POLOLU}" "${DST_BOARD_TXT_328PB_POLOLU}"
+    echo "Copied ${SRC_BOARD_TXT_328PB_POLOLU} to ${DST_BOARD_TXT_328PB_POLOLU}"
+  fi
+
   # Preserve EEPROM
   if [ ! -n "$flg_fuse" ]; then
-    #echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Uhfuse:w:0xD2:m
-    avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Uhfuse:w:0xD2:m
+    #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Uhfuse:w:0xD2:m
+    avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Uhfuse:w:0xD2:m
   fi
   # Flash
-  #echo avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
-  avrdude ${CONF_OPTION} ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
+  #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
+  avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
 
-  echo
-  echo "Successfully ${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX} flashed for ATmega${MCU_UPPER}."
+  if [ -n "${BRANCH_TYPE}" ]; then
+    echo "0x${BRANCH_TYPE} has been written into EEPROM"
+  fi
 fi
