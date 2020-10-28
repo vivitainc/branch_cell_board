@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v5.0"
+VERSION="${PROGNAME} v5.1"
 echo
 echo ${VERSION}
 echo
@@ -175,13 +175,12 @@ fi
 DIR_INO_PATH=${DIR_INO_ROOT}/${INO_DIR_NAME}
 DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
 
-  # Fuse
-  echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -D -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
-  avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -D -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
-  # Flash
-  echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC}:i
-  avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC}:i
+# Flash
+echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC}:i
+avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC}:i
+# Fuse
+echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -D -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Ulock:w:0x2F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -D -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Ulock:w:0x2F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
 
-  echo
-  echo "Successfully ${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC} flashed for ATmega${MCU_UPPER}."
-#fi
+echo
+echo "Successfully ${FIXED_DIR_BOOTLOADER}/${FIXED_BOOTLOADER_NAME_SRC} flashed for ATmega${MCU_UPPER}."
