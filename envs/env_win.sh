@@ -19,14 +19,16 @@ DIR_TOOLS3="${DIR_USER2}"
 DIR_BUILTIN_LIB="${DIR_ARDUINO}/libraries"
 DIR_LIB="${DIR_USER}/libraries"
 
-DST_BOOTLOADER_328P_DIR="${DIR_ARDUINO}/hardware/arduino/avr/bootloaders/atmega"
-DST_BOOTLOADER_328PB_DIR="${DIR_USER2}/pololu-a-star/hardware/avr/4.0.2/bootloaders/atmega"
+BOOTLOADER_328_FILE=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
+DIR_BOOTLOADER=bootloaders/atmega
+DST_BOOTLOADER_328P_DIR="${DIR_ARDUINO}/hardware/arduino/avr/${DIR_BOOTLOADER}"
+DST_BOOTLOADER_328PB_DIR="${DIR_USER2}/pololu-a-star/hardware/avr/4.0.2/${DIR_BOOTLOADER}"
 
-DST_BOOTLOADER_328P_FILE=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
-SRC_BOOTLOADER_328P_FILE=bootloaders/atmega/ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
+DST_BOOTLOADER_328P_FILE=${BOOTLOADER_328_FILE}
+SRC_BOOTLOADER_328P_FILE=${DIR_BOOTLOADER}/${BOOTLOADER_328_FILE}
 
-DST_BOOTLOADER_328PB_FILE=ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
-SRC_BOOTLOADER_328PB_FILE=bootloaders/atmega/ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
+DST_BOOTLOADER_328PB_FILE=${BOOTLOADER_328_FILE}
+SRC_BOOTLOADER_328PB_FILE=${DIR_BOOTLOADER}/${BOOTLOADER_328_FILE}
 DST_BOARD_TXT_328PB_POLOLU="${DIR_USER2}/pololu-a-star/hardware/avr/4.0.2/boards.txt"
 SRC_BOARD_TXT_328PB_POLOLU=pololu-a-star/boards.txt
 
