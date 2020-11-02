@@ -67,7 +67,7 @@ function GetBranchType() {
   local branchtype_line=$(grep -E "^const\s+uint32_t\s+BRANCH_TYPE" ${ino_file})
   local branchtype=$(echo "${branchtype_line}" | sed -e 's|^.*BRANCH_TYPE *= *0x\([0-9a-fA-F]\{1,\}\);.*|\1|')
 
-  echo ${branchtype}
+  echo ${branchtype:-0}
 }
 
 if [ $# = 0 ]; then
