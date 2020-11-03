@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v4.1"
+VERSION="${PROGNAME} v5.0"
 echo
 echo ${VERSION}
 echo
@@ -57,7 +57,6 @@ function Usage() {
   echo "  -p <port number or name>   Port number or name to Arduino ISP"
   echo "  -b                         Set fuse bit, write BRANCH_TYPE into EEPROM"
   echo "  -f <sketch name>           Flash firmware w/ arduino bootloader"
-  echo "  -r                         Force recompile (also require -f option)"
   echo "  -F                         Force flash in avrdude even if device signature is invalid"
   echo
   exit 1
@@ -68,7 +67,7 @@ function GetBranchType() {
   local branchtype_line=$(grep -E "^const\s+uint32_t\s+BRANCH_TYPE" ${ino_file})
   local branchtype=$(echo "${branchtype_line}" | sed -e 's|^.*BRANCH_TYPE *= *0x\([0-9a-fA-F]\{1,\}\);.*|\1|')
 
-  echo ${branchtype}
+  echo ${branchtype:-0}
 }
 
 if [ $# = 0 ]; then
@@ -105,11 +104,6 @@ while(( $# > 0 )); do
           'b')
             # Fuse bit, Lock bit etc.
             flg_fuse=1
-            break
-            ;;
-          'r')
-            # Recompile
-            flg_recompile=1
             break
             ;;
           'F')
@@ -232,35 +226,6 @@ if [ -z "$com" ]; then
   exit
 fi
 
-if [ -n "$flg_fuse" ]; then
-  echo "Write Fuse bit etc to ATmega${MCU_UPPER}."
-  #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
-  avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Ulock:w:0x3F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
-
-  if [ -n "${FW_ARG}" ]; then
-    echo "Write BRANCH_TYPE into ATmega${MCU_UPPER} EEPROM."
-    # Get BRANCH_TYPE
-    readonly BRANCH_TYPE=$(GetBranchType ${REL_INO_FILE})
-    echo BRANCH_TYPE=0x${BRANCH_TYPE}
-
-    # Generate Hex file
-    python ${BASEDIR}/hex_generator.py ${BRANCH_TYPE} ${EEPROM_HEX_FILE}
-    if [ $? -ne 0 ]; then
-      echo
-      echo 'May need python installation and "pip install IntelHex"'
-      ErrorMsg
-    fi
-
-    # Flash BRANCH_TYPE to EEPROM
-    #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/${EEPROM_HEX_FILE}:i
-    avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/${EEPROM_HEX_FILE}:i
-    rm ${BASEDIR}/${EEPROM_HEX_FILE}
-    # Verify
-    #echo "Verify BRANCH_TYPE."
-    #avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:r:${BASEDIR}/verify.hex:i
-  fi
-fi
-
 DIR_INO_PATH=${DIR_INO_ROOT}/${INO_DIR_NAME}
 DIR_REL_BUILD_PATH=${DIR_INO_PATH}/${DIR_BUILD}
 if [ ! -e "${DIR_REL_BUILD_PATH}" ]; then
@@ -268,31 +233,9 @@ if [ ! -e "${DIR_REL_BUILD_PATH}" ]; then
 fi
 
 if [ -n "${FW_ARG}" ]; then
-  if [ -n "$flg_recompile" ] || [ ! -e "${REL_HEX_FILE}" ]; then
-    echo "Compile firmware w/bootloader for ATmega${MCU_UPPER}."
-
-    if [ -e "${DIR_REL_BUILD_PATH}/libraries" ]; then
-      rm -r "${DIR_REL_BUILD_PATH}/libraries"
-    fi
-    if [ -e "${DIR_REL_BUILD_PATH}/core" ]; then
-      rm -r "${DIR_REL_BUILD_PATH}/core"
-    fi
-    DIR_ABS_BUILD_PATH=$(cd $DIR_REL_BUILD_PATH && pwd)
-
-    # Copy bootloader to ${FIXED_DST_BOOTLOADER_DIR}
-    if [ ! -e "${FIXED_DST_BOOTLOADER_DIR}" ]; then
-      mkdir -p ${FIXED_DST_BOOTLOADER_DIR}
-    fi
-    echo cp "${FIXED_SRC_BOOTLOADER_FILE}" "${FIXED_DST_BOOTLOADER_DIR}/${FIXED_DST_BOOTLOADER_FILE}"
-    cp "${FIXED_SRC_BOOTLOADER_FILE}" "${FIXED_DST_BOOTLOADER_DIR}/${FIXED_DST_BOOTLOADER_FILE}"
-
-    # Compile
-    #echo arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-    arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-    #echo arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-    arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${INO_DIR_NAME}.ino
-  else
-    echo "Skip firmware compilation."
+  if [ ! -e "${REL_HEX_FILE}" ]; then
+    echo ${FW_ARG} not found
+    ErrorMsg
   fi
 
   echo "Flash firmware w/bootloader to ATmega${MCU_UPPER}."
@@ -303,16 +246,54 @@ if [ -n "${FW_ARG}" ]; then
     echo "Copied ${SRC_BOARD_TXT_328PB_POLOLU} to ${DST_BOARD_TXT_328PB_POLOLU}"
   fi
 
-  # Preserve EEPROM
-  if [ ! -n "$flg_fuse" ]; then
-    #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Uhfuse:w:0xD2:m
-    avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -e -Uhfuse:w:0xD2:m
-  fi
   # Flash
-  #echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
+  echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
   avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:w:${DIR_REL_BUILD_PATH}/${INO_DIR_NAME}.${FW_HEX_SUFFIX}:i
+  if [ $? -ne 0 ]; then
+    ErrorMsg
+  fi
+
+  if [ -n "$flg_fuse" ]; then
+    # Lock Bit Protection - BLB1 Mode 2 BLB12=0b1, BLB11=0b0: SPM is not allowed to write to the Boot Loader section.
+    echo "Write Fuse bit etc to ATmega${MCU_UPPER}."
+    echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -D -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Ulock:w:0x2F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+    avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -D -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Ulock:w:0x2F:m -Uefuse:w:0xF5:m -Uhfuse:w:0xD2:m -Ulfuse:w:0xFF:m
+    if [ $? -ne 0 ]; then
+      ErrorMsg
+    fi
+
+    if [ -n "${FW_ARG}" ]; then
+      echo "Write BRANCH_TYPE into ATmega${MCU_UPPER} EEPROM."
+      # Get BRANCH_TYPE
+      readonly BRANCH_TYPE=$(GetBranchType ${REL_INO_FILE})
+      echo BRANCH_TYPE=0x${BRANCH_TYPE}
+
+      # Generate Hex file
+      python ${BASEDIR}/hex_generator.py ${BRANCH_TYPE} ${EEPROM_HEX_FILE}
+      if [ $? -ne 0 ]; then
+        echo
+        echo 'May need python installation and "pip install IntelHex"'
+        ErrorMsg
+      fi
+
+      # Flash BRANCH_TYPE to EEPROM
+      echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/${EEPROM_HEX_FILE}:i
+      avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" ${FORCE_OPTION} -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:w:${BASEDIR}/${EEPROM_HEX_FILE}:i
+      if [ $? -ne 0 ]; then
+        ErrorMsg
+      fi
+
+      rm ${BASEDIR}/${EEPROM_HEX_FILE}
+      # Verify
+      #echo "Verify BRANCH_TYPE."
+      #avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -U eeprom:r:${BASEDIR}/verify.hex:i
+    fi
+  fi
 
   if [ -n "${BRANCH_TYPE}" ]; then
     echo "0x${BRANCH_TYPE} has been written into EEPROM"
   fi
+else
+  echo "Error: -f option must be required"
+  Usage
 fi
