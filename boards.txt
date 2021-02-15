@@ -11,7 +11,7 @@ a-star328PB.bootloader.tool=avrdudecustom
 a-star328PB.bootloader.low_fuses=0xFF
 a-star328PB.bootloader.high_fuses=0xDE
 a-star328PB.bootloader.unlock_bits=0xFF
-a-star328PB.bootloader.lock_bits=0xCF
+a-star328PB.bootloader.lock_bits=0x0F
 
 a-star328PB.build.mcu=atmega328p
 a-star328PB.build.board=AVR_A_STAR_328PB
