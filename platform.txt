@@ -1,4 +1,4 @@
-name=Pololu A-Star Boards
+name=VIVITA Boards
 version=4.0.2
 
 tools.avrdudecustom.path={runtime.tools.avrdude.path}
