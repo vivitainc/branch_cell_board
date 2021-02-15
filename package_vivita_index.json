@@ -1,0 +1,13 @@
+{
+  "packages": [
+    {
+      "name": "viviware",
+      "maintainer": "VIVITA, Inc.",
+      "websiteURL": "https://vivita.co/",
+      "email": "info@vivita.co",
+
+      "platforms": [],
+      "tools": []
+    }
+  ]
+}
