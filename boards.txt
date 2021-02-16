@@ -16,6 +16,7 @@ cell-328pb.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 cell-328pb.bootloader.unlock_bits=0xFF
 cell-328pb.bootloader.lock_bits=0x0F
 
+#cell-328pb.build.mcu=atmega328pb
 cell-328pb.build.mcu=atmega328p
 cell-328pb.build.board=AVR_A_STAR_328PB
 cell-328pb.build.f_cpu=8000000L
