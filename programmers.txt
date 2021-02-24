@@ -1,4 +1,4 @@
-stk500for328PB.name=STK500 for VIVIWARE Cell 328PB
+stk500for328PB.name=STK500 for VIVIWARE Cell
 stk500for328PB.communication=serial
 stk500for328PB.protocol=stk500
 stk500for328PB.program.protocol=stk500
