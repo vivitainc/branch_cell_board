@@ -25,8 +25,8 @@ cell-328pb.build.variant=cell-328pb
 
 ##############################################################
 cell-328pb.menu.version.custom=Custom
-cell-328pb.menu.version.custom.build.extra_flags=-DCORE_COMM_UART_PORT=1 -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
+cell-328pb.menu.version.custom.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_CUSTOM -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
 
 ##############################################################
 cell-328pb.menu.version.branch=Branch
-cell-328pb.menu.version.branch.build.extra_flags=-DCORE_COMM_UART_PORT=0 -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
+cell-328pb.menu.version.branch.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_BRANCH -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
