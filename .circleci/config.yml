@@ -1,0 +1,55 @@
+version: 2.1
+executors:
+  build:
+    docker:
+      - image: vivitafwteam/arduino-docker:1.1
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          TZ: Asia/Tokyo
+          GIT_BOT_EMAIL: developer@piccolo.co
+          GIT_BOT_NAME: vivita-redmine[bot]
+          GIT_DIR_BRANCH_CELL: /root/branch_cell
+          CONCURRENT_JOBS: 2
+
+jobs:
+  build:
+    executor:
+      name: build
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "8b:15:b7:4a:01:78:02:17:49:f3:cb:5a:36:9f:90:be"
+      - checkout
+      - run:
+          name: Checkout branch_cell
+          command: |
+            git clone git@github.com:vivitainc/branch_cell.git ${GIT_DIR_BRANCH_CELL}
+      - run:
+          name: Apply latest board configuration
+          command: |
+            BOARD_VER="${CIRCLE_TAG:-1.0.0}"
+            rm -rf  ${HOME}/.arduino15/packages/viviware/hardware/avr/*
+            mkdir   ${HOME}/.arduino15/packages/viviware/hardware/avr/${BOARD_VER}
+            cp -r * ${HOME}/.arduino15/packages/viviware/hardware/avr/${BOARD_VER}/
+            ls -R   ${HOME}/.arduino15/packages/viviware/hardware/avr
+      - run:
+          name: Build all latest branch with version=branch
+          command: |
+            cd ${GIT_DIR_BRANCH_CELL}
+            bash build.sh -c -a
+      - run:
+          name: Build all latest branch with version=custom
+          command: |
+            cd ${GIT_DIR_BRANCH_CELL}
+            bash build.sh -c -a -t 1
+
+workflows:
+  version: 2.1
+  development:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /.*/
