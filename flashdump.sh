@@ -16,29 +16,7 @@ FW_ARG=dump/flashdump
 
 FW_HEX_SUFFIX="hex"
 DUMP_NAME_SUFFIX="_32"
-BOARD_328P_NAME="arduino:avr:vivi:cpu=Viviboot8MHz"
-BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzVivita"
 DEFAULT_MICRO=328pb
-
-HARDWARE="-hardware "${DIR_HARDWARE1}
-
-if [ -e "${DIR_HARDWARE2}" ]; then
-    HARDWARE=${HARDWARE}" -hardware "${DIR_HARDWARE2}
-fi
-
-if [ -e "${DIR_HARDWARE3}" ]; then
-    HARDWARE=${HARDWARE}" -hardware "${DIR_HARDWARE3}
-fi
-
-TOOLS="-tools "${DIR_TOOLS1}
-
-if [ -e "${DIR_TOOLS2}" ]; then
-    TOOLS=${TOOLS}" -tools "${DIR_TOOLS2}
-fi
-
-if [ -e "${DIR_TOOLS3}" ]; then
-    TOOLS=${TOOLS}" -tools "${DIR_TOOLS3}
-fi
 
 export PATH="${DIR_ARDUINO_BIN}:${DIR_ARDUINO}:$PATH"
 
@@ -115,12 +93,7 @@ fi
 MCU_TYPE=${DEFAULT_MICRO}
 MCU_LOWER=`echo ${MCU_TYPE} | tr '[A-Z]' '[a-z]'`
 MCU_UPPER=`echo ${MCU_TYPE} | tr '[a-z]' '[A-Z]'`
-BOARD_NAME=${BOARD_328PB_NAME}
-FIXED_SRC_BOOTLOADER_FILE=${SRC_BOOTLOADER_328PB_FILE}
-FIXED_DST_BOOTLOADER_DIR=${DST_BOOTLOADER_328PB_DIR}
-FIXED_DST_BOOTLOADER_FILE=${DST_BOOTLOADER_328PB_FILE}
 
-#echo "BOARD_NAME=${BOARD_NAME}"
 #echo "MCU_LOWER=${MCU_LOWER}"
 #echo "MCU_UPPER=${MCU_UPPER}"
 
@@ -167,8 +140,8 @@ fi
 
 if [ -n "${FW_ARG}" ]; then
   # Dump
-  echo avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX}:i
-  avrdude -C "${CONF1_FILE}" -C +"${CONF2_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX}:i
+  echo avrdude -C "${CONF1_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX}:i
+  avrdude -C "${CONF1_FILE}" -v -p atmega${MCU_LOWER} -c stk500v1 -P ${PORT_PREFIX}${com} -b 19200 -Uflash:r:${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX}:i
   echo python hex_converter16.py ${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX} ${FW_ARG}.${FW_HEX_SUFFIX}
   python hex_converter16.py ${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX} ${FW_ARG}.${FW_HEX_SUFFIX}
   rm ${FW_ARG}${DUMP_NAME_SUFFIX}.${FW_HEX_SUFFIX}
