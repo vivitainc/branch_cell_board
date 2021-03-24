@@ -11,6 +11,7 @@ DIR_ARDUINO_BIN=${DIR_ARDUINO}/hardware/tools/avr/bin
 DIR_HARDWARE1=${DIR_ARDUINO}/hardware
 DIR_HARDWARE2=${DIR_USER}/hardware
 DIR_HARDWARE3=${DIR_USER2}
+DIR_HARDWARE4=${DIR_USER2}/viviware/hardware/avr
 
 DIR_TOOLS1=${DIR_ARDUINO}/tools-builder
 DIR_TOOLS2=${DIR_ARDUINO}/hardware/tools/avr

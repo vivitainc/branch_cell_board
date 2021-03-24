@@ -1,18 +1,22 @@
 #!/bin/bash
 
 PROGNAME=$(basename $0)
-VERSION="${PROGNAME} v4.0"
+VERSION="${PROGNAME} v6.0"
 echo
 echo ${VERSION}
 echo
 
-ENV_DIR="$(pwd -P)/envs"
+ENV_DIR="$(pwd -P)/utils/envs"
 source "${ENV_DIR}/env.sh"
 
 DIR_INO_ROOT=examples
 DIR_BUILD=build
 DIR_EX_LIB=externals
 DIR_OWN_LIB=VivicoreSerial
+DIR_WORKSPACE=_workspace
+WINAVR_GCC='WinAVR-20100110'
+DIR_WINAVR_GCC_BIN="/c/${WINAVR_GCC}/bin"
+DIR_TMP_HARDWARE_PACKAGE="${DIR_HARDWARE4}/0.0.1"
 
 DIR_SKETCH=sketch
 FW_BIN_SUFFIX="ino.bin"
@@ -21,10 +25,11 @@ FW_W_BL_HEX_SUFFIX="ino.with_bootloader.hex"
 BUILD_OPTION_FILE="build.options.json"
 BUILD_LOG_NAME="build.log"
 BUILD_ERRLOG_NAME="error.log"
-BOARD_328P_NAME="arduino:avr:vivi:cpu=Viviboot8MHz"
-BOARD_328PB_NAME="pololu-a-star:avr:a-star328PB:version=8mhzVivita"
-DEFAULT_MICRO=328pb
-MICRO_OPTION="328p or 328pb"
+BOARD_TYPES=('branch' 'custom')
+BOARD_TYPE_NUMBER=0
+BOARD_328PB_NAME="viviware:avr:cell-328pb:version="
+MCU_TYPE=328pb
+ERROR_MESSAGES=()
 
 HARDWARE="-hardware \"${DIR_HARDWARE1}\""
 
@@ -57,15 +62,37 @@ export PATH="${DIR_ARDUINO_BIN}:${DIR_ARDUINO}:$PATH"
 BASEDIR=$(cd $(dirname $0); pwd)
 #echo ${BASEDIR}
 
+function Clobber() {
+  if [ -e "${DIR_WORKSPACE}" ]; then
+    # Remove all libraries
+    rm -rf ${DIR_WORKSPACE}
+  fi
+}
+
+function ListBoardTypes() {
+  local ret
+  local sep
+
+  for i in $(seq 0 $((${#BOARD_TYPES[@]} - 1))); do
+    ret="${ret}${sep}${i} for ${BOARD_TYPES[${i}]}"
+    sep=', '
+  done
+
+  echo "${ret}"
+}
+
 function Usage() {
   echo 
   echo "Usage: ${PROGNAME} [Options]"
-  echo 
+  echo
+  echo "Note: This script builds bootloader and applies them as ${DIR_TMP_HARDWARE_PACKAGE}."
+  echo "      Install again VIVIWARE board package after build with this script."
+  echo
   echo "Option: One of the options must be required"
   echo "  -h, --help              Help"
   echo "      --version           Show version"
-  echo "  -m, --mcu <mcu_name>    Specify the target MCU ${MICRO_OPTION}"
   echo "  -f, --fw <fw_name>      Build a specific fw"
+  echo "  -t, --board-type <num>  Build with board type number (default: $(ListBoardTypes))"
   echo "  -r, --rebuild           Clean and Rebuild"
   echo "  -c, --clean             Clean"
   echo "  -a, --all               Build all fw"
@@ -100,14 +127,12 @@ for opt in "$@"; do
       flg_build_all=1
       shift
       ;;
-    '-m' | '--mcu' )
-      # mcu must need an arg
+    '-t' | '--board-type' )
       if [[ -z "$2" ]] || [[ "$2" =~ ^-+ ]]; then
         echo "${PROGNAME}: $1 option requires an argument" 1>&2
-        echo "Provide ${MICRO_OPTION}" 1>&2
         exit 1
       fi
-      MCU_ARG=("$2")
+      BOARD_TYPE_NUMBER="${2}"
       shift 2
       ;;
     '-f' | '--fw' )
@@ -150,33 +175,19 @@ PARAM1="${PARAM}"; PARAM=("${PARAM[@]:1}")
 #echo "PARAM1=${PARAM1}"
 if [ -z "${FW_ARG}" ] && [ -z "${PARAM1}" ] && [ -z "${flg_clean}" ] && [ -z "${flg_build_all}" ]; then
   Usage
+elif ! [[ "${BOARD_TYPE_NUMBER}" =~ [0-9]+ ]] || [ "${BOARD_TYPE_NUMBER}" -ge "${#BOARD_TYPES[@]}" ]; then
+  echo
+  echo "Cannot recognize -t/--board-type argument ${BOARD_TYPE_NUMBER}" 1>&2
+  echo "Select one of $(ListBoardTypes)" 1>&2
+  exit 1
 elif [ ! -n "${FW_ARG}" ]; then
   # argument without -f|--fw option is treated as FW_ARG
   FW_ARG="${PARAM1}"
 fi
 
-# Verify ${MCU_ARG} and define ${BOARD_NAME}
-if [ ! -n "${MCU_ARG}" ]; then
-  MCU_TYPE=${DEFAULT_MICRO}
-else
-  MCU_TYPE=${MCU_ARG}
-fi
 MCU_UPPER=`echo ${MCU_TYPE} | tr '[a-z]' '[A-Z]'`
-if [ "${MCU_UPPER}" = "328P" ]; then
-  BOARD_NAME=${BOARD_328P_NAME}
-  FIXED_SRC_BOOTLOADER_FILE=${SRC_BOOTLOADER_328P_FILE}
-  FIXED_DST_BOOTLOADER_DIR=${DST_BOOTLOADER_328P_DIR}
-  FIXED_DST_BOOTLOADER_FILE=${DST_BOOTLOADER_328P_FILE}
-elif [ "${MCU_UPPER}" = "328PB" ]; then
-  BOARD_NAME=${BOARD_328PB_NAME}
-  FIXED_SRC_BOOTLOADER_FILE=${SRC_BOOTLOADER_328PB_FILE}
-  FIXED_DST_BOOTLOADER_DIR=${DST_BOOTLOADER_328PB_DIR}
-  FIXED_DST_BOOTLOADER_FILE=${DST_BOOTLOADER_328PB_FILE}
-else
-  echo "Cannot recognize -m/--mcu argument ${MCU_ARG}" 1>&2
-  echo "Provide ${MICRO_OPTION}" 1>&2
-  exit 1
-fi
+BOARD_TYPE=${BOARD_TYPES[${BOARD_TYPE_NUMBER}]}
+BOARD_NAME=${BOARD_328PB_NAME}${BOARD_TYPE}
 
 # Verify ${FW_ARG} and create ${INO_DIR_NAME}, ${DIR_INO_ROOT}, ${REL_INO_FILE}
 if [ -n "${FW_ARG}" ]; then
@@ -185,13 +196,13 @@ if [ -n "${FW_ARG}" ]; then
       # If ${FW_ARG} is ino file full path
       INO_FILE_NAME=${FW_ARG##*/}
       INO_DIR_NAME=${INO_FILE_NAME%.*}
-      DIR_INO_ROOT=${FW_ARG%%/*}
+      DIR_INO_ROOT=${FW_ARG%%/${INO_DIR_NAME}*}
       REL_INO_FILE="${FW_ARG}"
       #echo "${FW_ARG} = ino file full path: ${REL_INO_FILE}"
     else
       # If ${FW_ARG} is ino directory full path
       INO_DIR_NAME=`basename ${FW_ARG}`
-      DIR_INO_ROOT=${FW_ARG%%/*}
+      DIR_INO_ROOT=${FW_ARG%%/${INO_DIR_NAME}*}
       REL_INO_FILE="${FW_ARG}/${INO_DIR_NAME}.ino"
       #echo "${FW_ARG} = ino directory path: ${REL_INO_FILE}"
     fi
@@ -230,6 +241,7 @@ echo "Clean     = ${flg_clean}"
 echo "Build_all = ${flg_build_all}"
 echo "INO_ROOT  = ${DIR_INO_ROOT}"
 echo "FW        = ${INO_DIR_NAME}"
+echo "BOARD_TYPE= ${BOARD_TYPE}"
 echo "----------------------------"
 
 function Clean() {
@@ -246,6 +258,42 @@ function Clean() {
     rm -r "${DIR_REL_BUILD_PATH}"
     #rm "${DIR_INO_PATH}/${BUILD_LOG_NAME}"
   fi
+}
+
+function GetSubmodules() {
+  if ! [ -d .git ]; then
+    echo "${FUNCNAME[0]} needs submodule libraries. Clone this repository but not use zip archive."
+    exit 1
+  fi
+
+  if [ "$(git --no-pager submodule status | grep -cE '^(-|\+)')" -gt 0 ]; then
+    git --no-pager submodule status | grep -E '^(-|\+)' | cut -d' ' -f2 | while read -r MODULE; do
+      git submodule update --init "${MODULE}"
+    done
+  fi
+}
+
+function CompileBootloader() {
+  if ! [ -d "${DIR_WINAVR_GCC_BIN}" ]; then
+    echo "${WINAVR_GCC} must be instelled to compile bootloader"
+    exit 1
+  fi
+
+  make -C ${DIR_BOOTLOADER} TOOLCHAIN_PREFIX="${DIR_WINAVR_GCC_BIN}/" clean all
+  echo
+  echo "Built $(ls ${DIR_BOOTLOADER}/*.hex) for ATmega${MCU_UPPER} with $("${DIR_WINAVR_GCC_BIN}/avr-gcc" --version | head -n 1)"
+}
+
+function InstallLocalPackage() {
+  echo
+  echo "Uninstall all package for VIVIWARE in ${DIR_HARDWARE4}"
+  mkdir -p "${DIR_HARDWARE4}"
+  rm -rf "${DIR_HARDWARE4:?}"/*
+
+  echo
+  echo "Install package as ${DIR_TMP_HARDWARE_PACKAGE}"
+  mkdir -p "${DIR_TMP_HARDWARE_PACKAGE}"
+  cp -rf ./* "${DIR_TMP_HARDWARE_PACKAGE}"/
 }
 
 function CompileFirmware() {
@@ -287,15 +335,19 @@ function CompileFirmware() {
   if [ -e "${DIR_INO_ROOT}/${ino_name}/${DIR_BUILD}/${BUILD_OPTION_FILE}" ]; then
     rm "${DIR_INO_ROOT}/${ino_name}/${DIR_BUILD}/${BUILD_OPTION_FILE}"
   fi
+  # Specify workspace directory path including our own and external library
+  if [ ! -d "${DIR_WORKSPACE}" ]; then
+    DIR_WORKSPACE="${DIR_LIB}"
+  fi
 
   # Compile
-  echo "Building ${DIR_INO_PATH}/${ino_name}.ino for ATmega${MCU_UPPER}"
+  echo "Building ${DIR_INO_PATH}/${ino_name}.ino for ATmega${MCU_UPPER} with $(avr-gcc --version | head -n 1)"
 
-  #echo arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${ino_name}.ino
-  eval "arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries \"${DIR_BUILTIN_LIB}\" -libraries \"${DIR_LIB}\" -fqbn=\"${BOARD_NAME}\" -build-path \"${DIR_ABS_BUILD_PATH}\" -verbose \"${DIR_INO_PATH}/${ino_name}.ino\"" 1> "${DIR_ABS_BUILD_PATH}/${BUILD_LOG_NAME}" 2> "${DIR_ABS_BUILD_PATH}/${BUILD_ERRLOG_NAME}"
+  #echo arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_WORKSPACE}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${ino_name}.ino
+  eval "arduino-builder -dump-prefs ${HARDWARE} ${TOOLS} -built-in-libraries \"${DIR_BUILTIN_LIB}\" -libraries \"${DIR_WORKSPACE}\" -fqbn=\"${BOARD_NAME}\" -build-path \"${DIR_ABS_BUILD_PATH}\" -verbose \"${DIR_INO_PATH}/${ino_name}.ino\"" 1> "${DIR_ABS_BUILD_PATH}/${BUILD_LOG_NAME}" 2> "${DIR_ABS_BUILD_PATH}/${BUILD_ERRLOG_NAME}"
 
-  #echo arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_LIB}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${ino_name}.ino
-  eval "arduino-builder -warnings more -compile ${HARDWARE} ${TOOLS} -built-in-libraries \"${DIR_BUILTIN_LIB}\" -libraries \"${DIR_LIB}\" -fqbn=\"${BOARD_NAME}\" -build-path \"${DIR_ABS_BUILD_PATH}\" -verbose \"${DIR_INO_PATH}/${ino_name}.ino\"" 1>> "${DIR_ABS_BUILD_PATH}/${BUILD_LOG_NAME}" 2>> "${DIR_ABS_BUILD_PATH}/${BUILD_ERRLOG_NAME}"
+  #echo arduino-builder -compile ${HARDWARE} ${TOOLS} -built-in-libraries "${DIR_BUILTIN_LIB}" -libraries "${DIR_WORKSPACE}" -fqbn="${BOARD_NAME}" -build-path "${DIR_ABS_BUILD_PATH}" -verbose ${DIR_INO_PATH}/${ino_name}.ino
+  eval "arduino-builder -warnings more -compile ${HARDWARE} ${TOOLS} -built-in-libraries \"${DIR_BUILTIN_LIB}\" -libraries \"${DIR_WORKSPACE}\" -fqbn=\"${BOARD_NAME}\" -build-path \"${DIR_ABS_BUILD_PATH}\" -verbose \"${DIR_INO_PATH}/${ino_name}.ino\"" 1>> "${DIR_ABS_BUILD_PATH}/${BUILD_LOG_NAME}" 2>> "${DIR_ABS_BUILD_PATH}/${BUILD_ERRLOG_NAME}"
 
   echo avr-objcopy -I ihex "${DIR_INO_ROOT}/${ino_name}/${DIR_BUILD}/${ino_name}.${FW_HEX_SUFFIX}" -O binary "${DIR_INO_ROOT}/${ino_name}/${DIR_BUILD}/${ino_name}.${FW_BIN_SUFFIX}"
   avr-objcopy -I ihex "${DIR_INO_ROOT}/${ino_name}/${DIR_BUILD}/${ino_name}.${FW_HEX_SUFFIX}" -O binary "${DIR_INO_ROOT}/${ino_name}/${DIR_BUILD}/${ino_name}.${FW_BIN_SUFFIX}"
@@ -339,38 +391,28 @@ function CheckRomRam() {
   fi
 }
 
-if [ -n "${flg_clean}" ]; then
-  # Clean user libraries
-  echo "Clean ${DIR_LIB}/${DIR_OWN_LIB}"
-  rm -r "${DIR_LIB}/${DIR_OWN_LIB}"
+Clobber
+
+ERR_SUBMODULES="$(GetSubmodules 2>&1 > /dev/null)"
+if [ -n "${ERR_SUBMODULES}" ]; then
+  ERROR_MESSAGES=("${ERROR_MESSAGES[@]}" "${ERR_SUBMODULES}")
 fi
 
 if [ -n "${flg_build_all}" ] || [ -n "${REL_INO_FILE}" ]; then
-  # Copy root *.h *.cpp to ${DIR_LIB}
+  # Copy root *.h *.cpp to ${DIR_WORKSPACE}
   #for lib_file in `\find . -maxdepth 1 -type f -name *.h | sed 's!^.*/!!'`; do
-  for lib_file in `ls -1 *.cpp *.h`; do
-    if [ ! -e "${DIR_LIB}/${DIR_OWN_LIB}" ]; then
-      mkdir -p "${DIR_LIB}/${DIR_OWN_LIB}"
+  for lib_file in *.cpp *.h; do
+    if [ -f "${lib_file}" ]; then
+      mkdir -p "${DIR_WORKSPACE}/${DIR_OWN_LIB}"
+      cp "${lib_file}" "${DIR_WORKSPACE}/${DIR_OWN_LIB}"
+      echo "Copied ${lib_file} to ${DIR_WORKSPACE}/${DIR_OWN_LIB}"
     fi
-    cp "${lib_file}" "${DIR_LIB}/${DIR_OWN_LIB}"
-    echo "Copied ${lib_file} to ${DIR_LIB}/${DIR_OWN_LIB}"
   done
 
-  # Copy libraries directory to ${DIR_LIB}
-  cp -R ${DIR_EX_LIB}/* "${DIR_LIB}/"
-  echo "Copied ${DIR_EX_LIB}/* to ${DIR_LIB}/"
-
-  # Copy bootloader to ${FIXED_DST_BOOTLOADER_DIR}
-  if [ ! -e "${FIXED_DST_BOOTLOADER_DIR}" ]; then
-    mkdir -p ${FIXED_DST_BOOTLOADER_DIR}
-  fi
-  echo cp "${FIXED_SRC_BOOTLOADER_FILE}" "${FIXED_DST_BOOTLOADER_DIR}/${FIXED_DST_BOOTLOADER_FILE}"
-  cp "${FIXED_SRC_BOOTLOADER_FILE}" "${FIXED_DST_BOOTLOADER_DIR}/${FIXED_DST_BOOTLOADER_FILE}"
-
-  # Copy ${SRC_BOARD_TXT_328PB_POLOLU} to ${DST_BOARD_TXT_328PB_POLOLU}
-  if [ "${MCU_UPPER}" = "328PB" ]; then
-    cp "${SRC_BOARD_TXT_328PB_POLOLU}" "${DST_BOARD_TXT_328PB_POLOLU}"
-    echo "Copied ${SRC_BOARD_TXT_328PB_POLOLU} to ${DST_BOARD_TXT_328PB_POLOLU}"
+  # Copy libraries directory to ${DIR_WORKSPACE}
+  if [ -d "${DIR_EX_LIB}" ]; then
+    cp -R ${DIR_EX_LIB}/* "${DIR_WORKSPACE}/"
+    echo "Copied ${DIR_EX_LIB}/* to ${DIR_WORKSPACE}/"
   fi
 fi
 
@@ -389,20 +431,31 @@ else
 fi
 #echo "LS_CMD=${LS_CMD}"
 
+# Clean, Compile, and apply bootloader
+if [ -n "${FW_ARG}" ] || [ -n "${flg_build_all}" ]; then
+  if [ -d "${DIR_BOOTLOADER}" ]; then
+    CompileBootloader
+    InstallLocalPackage
+  fi
+fi
+
 # Clean and Compile
 for ino_dir in `${LS_CMD}`; do
   if [ ! -d "${DIR_INO_ROOT}/$ino_dir" ]; then
     continue
   fi
-  if [ -n "${flg_clean}" ] || [ -n "${MCU_ARG}" ]; then
-    # If user specifies MCU_ARG with -m/--mcu option, target micro might be changed.
-    # Since arduino-builder reuses the cached core.a, core.a should be regenerated in above case.
+  if [ -n "${flg_clean}" ]; then
     Clean "$ino_dir"
   fi
   if [ -n "${FW_ARG}" ] || [ -n "${flg_build_all}" ]; then
     CompileFirmware "$ino_dir"
   fi
 done
+
+# Clean bootloader and package
+if [ -d "${DIR_TMP_HARDWARE_PACKAGE}" ]; then
+  rm -rf "${DIR_TMP_HARDWARE_PACKAGE}"
+fi
 
 # Verify compile results
 if [ -n "${FW_ARG}" ] || [ -n "${flg_build_all}" ]; then
@@ -423,8 +476,13 @@ if [ -n "${FW_ARG}" ] || [ -n "${flg_build_all}" ]; then
   done
 fi
 
+if [ "${#ERROR_MESSAGES[@]}" -gt 0 ]; then
+  ERROR_NOTICE="with below errors or warnings"
+fi
+
 echo
-echo "Done"
+echo "Done ${ERROR_NOTICE}"
+echo "${ERROR_MESSAGES[@]}"
 
 exit 0
 
