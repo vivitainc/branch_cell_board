@@ -5,8 +5,30 @@
       "maintainer": "VIVITA, Inc.",
       "websiteURL": "https://vivita.co/",
       "email": "info@vivita.co",
-
-      "platforms": [],
+      "platforms": [
+        {
+          "name": "VIVIWARE Cell Custom Boards",
+          "architecture": "avr",
+          "version": "6.0.0-rc1",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/vivitainc/custom_cell_boards"
+          },
+          "url": "https://github.com/vivitainc/custom_cell_boards/archive/6.0.0-rc1.zip",
+          "archiveFileName": "custom_cell_boards-6.0.0-rc1.zip",
+          "checksum": "SHA-256:cb6f0457269ec1772f7a5a48ff7ca061b57944422fce8a562e520377dbd5d3a0",
+          "size": "191460",
+          "boards": [
+            {
+              "name": "VIVIWARE Cell Branch"
+            },
+            {
+              "name": "VIVIWARE Cell Custom"
+            }
+          ],
+          "toolsDependencies": []
+        }
+      ],
       "tools": []
     }
   ]
