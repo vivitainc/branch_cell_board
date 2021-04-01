@@ -5,7 +5,7 @@ This configuration is based on [Pololu A-Star configuration](https://github.com/
 Refer to [README on VivicoreSerial library](https://github.com/vivitainc/VivicoreSerial#how-to-setup).
 
 # Version history
-- 6.0.0 (2021-04-01): Add [328PB ATmega bootloader v5.3](https://github.com/vivitainc/atmega_bootloader/releases/tag/5.3)
+- 6.0.0 (2021-04-01): Add customized ATmegaBOOT
                       and support VIVIWARE Cell Custom and Branch boards.
 - 4.0.2 (2018-04-17): Fixed an unquoted path in build flags that could cause an
                       error when compiling for the 328PB.
