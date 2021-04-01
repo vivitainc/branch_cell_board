@@ -1,0 +1,132 @@
+version: 2.1
+executors:
+  build:
+    docker:
+      - image: vivitafwteam/arduino-docker:1.1
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          TZ: Asia/Tokyo
+          GIT_DIR_BRANCH_CELL: /root/branch_cell
+  deploy:
+    docker:
+      - image: node:14
+        auth:
+          username: $DOCKERHUB_USER
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          TZ: Asia/Tokyo
+          GIT_BOT_EMAIL: developer@piccolo.co
+          GIT_BOT_NAME: vivita-redmine[bot]
+
+jobs:
+  build:
+    executor:
+      name: build
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "8b:15:b7:4a:01:78:02:17:49:f3:cb:5a:36:9f:90:be"
+      - checkout
+      - run:
+          name: Checkout branch_cell
+          command: |
+            git clone git@github.com:vivitainc/branch_cell.git ${GIT_DIR_BRANCH_CELL}
+      - run:
+          name: Apply latest board configuration
+          command: |
+            BOARD_VER="${CIRCLE_TAG:-1.0.0}"
+            rm -rf  ${HOME}/.arduino15/packages/viviware/hardware/avr/*
+            mkdir   ${HOME}/.arduino15/packages/viviware/hardware/avr/${BOARD_VER}
+            cp -r * ${HOME}/.arduino15/packages/viviware/hardware/avr/${BOARD_VER}/
+            ls -R   ${HOME}/.arduino15/packages/viviware/hardware/avr
+      - run:
+          name: Build all latest branch with version=branch
+          command: |
+            cd ${GIT_DIR_BRANCH_CELL}
+            bash build.sh -c -a
+      - run:
+          name: Build all latest branch with version=custom
+          command: |
+            cd ${GIT_DIR_BRANCH_CELL}
+            bash build.sh -c -a -t 1
+
+  deploy:
+    executor:
+      name: deploy
+    steps:
+      - add_ssh_keys:
+          fingerprints:
+            - "cf:f7:d0:83:56:3f:62:e0:77:74:0d:4f:bb:db:cc:3b"
+      - checkout
+      - run:
+          name: Check timezone
+          command: |
+            date
+      - run:
+          name: Commit and push bin files
+          command: |
+            git checkout master
+
+            PACKAGE_JSON='./package_vivita_index.json'
+            ARCHIVE_NAME=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_TAG}.zip
+            wget https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/archive/refs/tags/${CIRCLE_TAG}.zip -O ${ARCHIVE_NAME}
+            ARCHIVE_SUM=$(shasum -a 256 ${ARCHIVE_NAME} | cut -d' ' -f 1)
+            ARCHIVE_SIZE=$(($(LANG=C ls -l ${ARCHIVE_NAME} | cut -d' ' -f 5)))
+
+            cat \<< EOF | node
+              const fs = require('fs');
+              let p = JSON.parse(fs.readFileSync('${PACKAGE_JSON}'));
+              const n = {
+                'name': 'VIVIWARE Cell Custom Boards',
+                'architecture': 'avr',
+                'version': '${CIRCLE_TAG}',
+                'category': 'Contributed',
+                'help': { 'online': 'https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}' },
+                'url': 'https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/archive/${CIRCLE_TAG}.zip',
+                'archiveFileName': '${ARCHIVE_NAME}',
+                'checksum': 'SHA-256:${ARCHIVE_SUM}',
+                'size': '${ARCHIVE_SIZE}',
+                'boards': [
+                  { 'name': 'VIVIWARE Cell Branch' },
+                  { 'name': 'VIVIWARE Cell Custom' }
+                ],
+                'toolsDependencies': []
+              };
+              p.packages[0].platforms.unshift(n);
+              fs.writeFileSync('${PACKAGE_JSON}', JSON.stringify(p, null, 2));
+            EOF
+            cat ${PACKAGE_JSON}
+
+            git config user.email ${GIT_BOT_EMAIL}
+            git config user.name ${GIT_BOT_NAME}
+            git commit -am "Add ${CIRCLE_TAG}"
+            git push origin master:master
+
+workflows:
+  version: 2.1
+  development:
+    jobs:
+      - build:
+          filters:
+            branches:
+              only: /.*/
+  release:
+    jobs:
+      - build:
+          filters:
+            tags:
+              only:
+              - /^[0-9]+\.[0-9]+\.[0-9]+([\+-][0-9A-Za-z-]+){0,1}$/
+            branches:
+              ignore: /.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
+              only:
+              - /^[0-9]+\.[0-9]+\.[0-9]+([\+-][0-9A-Za-z-]+){0,1}$/
+            branches:
+              ignore: /.*/

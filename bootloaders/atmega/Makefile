@@ -26,6 +26,8 @@ ISPSPEED   = -b 115200
 MCU_TARGET = atmega168
 LDSECTION  = --section-start=.text=0x3800
 
+TOOLCHAIN_PREFIX ?= "C:\WinAVR-20100110\bin\\"
+
 # the efuse should really be 0xf8; since, however, only the lower
 # three bits of that byte are used on the atmega168, avrdude gets
 # confused if you specify 1's for the higher bits, see:
@@ -53,7 +55,7 @@ OPTIMIZE   = -Os
 DEFS       =
 LIBS       =
 
-CC         = avr-gcc
+CC         = $(TOOLCHAIN_PREFIX)avr-gcc
 
 # Override is only needed by avr-lib build system.
 
@@ -61,10 +63,10 @@ override CFLAGS        = -g -Wall $(OPTIMIZE) -mmcu=$(MCU_TARGET) -DF_CPU=$(AVR_
 override LDFLAGS       = -Wl,$(LDSECTION)
 #override LDFLAGS       = -Wl,-Map,$(PROGRAM).map,$(LDSECTION)
 
-OBJCOPY        = avr-objcopy
-OBJDUMP        = avr-objdump
+OBJCOPY        = $(TOOLCHAIN_PREFIX)avr-objcopy
+OBJDUMP        = $(TOOLCHAIN_PREFIX)avr-objdump
 
-all:
+all: atmega328_pro8
 
 lilypad: TARGET = lilypad
 lilypad: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>1' '-DNUM_LED_FLASHES=3'
