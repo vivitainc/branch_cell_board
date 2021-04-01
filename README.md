@@ -5,10 +5,8 @@ This configuration is based on [Pololu A-Star configuration](https://github.com/
 Refer to [README on VivicoreSerial library](https://github.com/vivitainc/VivicoreSerial#how-to-setup).
 
 # Version history
-- 5.3.0 : GPIO0 |= 1 to notify firmware app if reset condition is watchdog refs #2113
-- 5.2.0 : Fix the issue to avoid repeating bootloader reboot infinitely if watchdog reset happens in FW Apps refs #646
-- 5.1.0 : Consolidate bootloader both for 328P and 328PB from v5.1 release tag refs #553
-- 5.0.0 : Customized bootloader for 328p and 328pb from v5.0 release tag refs #540
+- 6.0.0 (2021-04-01): Add [328PB ATmega bootloader v5.3](https://github.com/vivitainc/atmega_bootloader/releases/tag/5.3)
+                      and support VIVIWARE Cell Custom and Branch boards.
 - 4.0.2 (2018-04-17): Fixed an unquoted path in build flags that could cause an
                       error when compiling for the 328PB.
 - 4.0.1 (2018-04-11): 328PB interrupt vectors should be linked into sketch more
