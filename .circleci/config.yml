@@ -65,11 +65,11 @@ jobs:
           command: |
             date
       - run:
-          name: Commit and push bin files
+          name: Commit and push package json with tagged version
           command: |
             git checkout master
 
-            PACKAGE_JSON='./package_vivita_index.json'
+            PACKAGE_JSON='./package_viviware_index.json'
             ARCHIVE_NAME=${CIRCLE_PROJECT_REPONAME}-${CIRCLE_TAG}.zip
             wget https://github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}/archive/refs/tags/${CIRCLE_TAG}.zip -O ${ARCHIVE_NAME}
             ARCHIVE_SUM=$(shasum -a 256 ${ARCHIVE_NAME} | cut -d' ' -f 1)

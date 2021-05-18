@@ -3,9 +3,8 @@
     {
       "name": "viviware",
       "maintainer": "VIVITA, Inc.",
-      "websiteURL": "https://vivita.co/",
       "email": "info@vivita.co",
-
+      "websiteURL": "https://vivita.co/",
       "platforms": [],
       "tools": []
     }
