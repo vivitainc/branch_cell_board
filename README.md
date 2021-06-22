@@ -5,6 +5,8 @@ This configuration is based on [Pololu A-Star configuration](https://github.com/
 Refer to [README on VivicoreSerial library](https://github.com/vivitainc/VivicoreSerial#how-to-setup).
 
 # Version history
+- 6.0.1 (2021-06-23): VIVITA, Inc. -> VIVIWARE JAPAN, Inc.
+                      and rename package_vivita_index.json -> package_viviware_index.json.
 - 6.0.0 (2021-04-01): Add customized ATmegaBOOT
                       and support VIVIWARE Cell Custom and Branch boards.
 - 4.0.2 (2018-04-17): Fixed an unquoted path in build flags that could cause an
