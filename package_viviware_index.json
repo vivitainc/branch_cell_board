@@ -2,10 +2,9 @@
   "packages": [
     {
       "name": "viviware",
-      "maintainer": "VIVITA, Inc.",
+      "maintainer": "VIVIWARE JAPAN, Inc.",
+      "email": "viviware-support@viviware.com",
       "websiteURL": "https://vivita.co/",
-      "email": "info@vivita.co",
-
       "platforms": [],
       "tools": []
     }
