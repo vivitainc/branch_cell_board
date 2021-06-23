@@ -3,8 +3,8 @@
     {
       "name": "viviware",
       "maintainer": "VIVITA, Inc.",
-      "websiteURL": "https://vivita.co/",
       "email": "info@vivita.co",
+      "websiteURL": "https://vivita.co/",
       "platforms": [
         {
           "name": "VIVIWARE Cell Custom Boards",
