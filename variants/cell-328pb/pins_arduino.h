@@ -82,7 +82,7 @@ static const uint8_t SCL0 = PIN_WIRE_SCL0;
 static const uint8_t SDA1 = PIN_WIRE_SDA1;
 static const uint8_t SCL1 = PIN_WIRE_SCL1;
 
-#define LED_BUILTIN 13
+#define LED_BUILTIN (6)
 
 #define PIN_A0   (14)
 #define PIN_A1   (15)
@@ -101,6 +101,11 @@ static const uint8_t A4 = PIN_A4;
 static const uint8_t A5 = PIN_A5;
 static const uint8_t A6 = PIN_A6;
 static const uint8_t A7 = PIN_A7;
+
+#define PIN_VIVIWARE_EN_RX     (7)
+#define PIN_VIVIWARE_EN_TX     (8)
+#define PIN_VIVIWARE_EN_PWR    (PIN_A3)
+#define PIN_VIVIWARE_DEBUG_LED (LED_BUILTIN)
 
 #define digitalPinToPCICR(p)    (((p) >= 0 && (p) <= 23) ? (&PCICR) : ((uint8_t *)0))
 #define digitalPinToPCICRbit(p) (((p) <= 7) ? 2 : (((p) <= 13) ? 0 : (((p) <= 19) ? 1 : 3)))
