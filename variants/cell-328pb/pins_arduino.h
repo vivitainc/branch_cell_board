@@ -104,7 +104,7 @@ static const uint8_t A7 = PIN_A7;
 
 #define PIN_VIVIWARE_EN_RX     (7)
 #define PIN_VIVIWARE_EN_TX     (8)
-#define PIN_VIVIWARE_EN_PWR    (PIN_A3)
+#define PIN_VIVIWARE_EN_PWR    (A3)
 #define PIN_VIVIWARE_DEBUG_LED (LED_BUILTIN)
 
 #define digitalPinToPCICR(p)    (((p) >= 0 && (p) <= 23) ? (&PCICR) : ((uint8_t *)0))
