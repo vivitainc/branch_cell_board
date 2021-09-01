@@ -5,6 +5,7 @@ This configuration is based on [Pololu A-Star configuration](https://github.com/
 Refer to [README on VivicoreSerial library](https://github.com/vivitainc/VivicoreSerial#how-to-setup).
 
 # Version history
+- x.x.x (2021-09-01): test for reminder
 - 6.0.2 (2021-09-01): Fixed LED_BUILTIN macro definition.
 - 6.0.1 (2021-06-23): VIVITA, Inc. -> VIVIWARE JAPAN, Inc.
                       and rename package_vivita_index.json -> package_viviware_index.json.
