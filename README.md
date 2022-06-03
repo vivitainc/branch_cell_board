@@ -5,7 +5,8 @@ This configuration is based on [Pololu A-Star configuration](https://github.com/
 Refer to [README on VivicoreSerial library](https://github.com/vivitainc/VivicoreSerial#how-to-setup).
 
 # Version history
-- 6.1.0 (2022-03-29): Add SPI1 library copied from [MCUdude/MiniCore](https://github.com/MCUdude/MiniCore).
+- 6.1.0 (2022-06-03): Add SPI1 library copied from [MCUdude/MiniCore](https://github.com/MCUdude/MiniCore).
+                      Add new option for UserBranch
 - 6.0.2 (2021-09-01): Fixed LED_BUILTIN macro definition.
 - 6.0.1 (2021-06-23): VIVITA, Inc. -> VIVIWARE JAPAN, Inc.
                       and rename package_vivita_index.json -> package_viviware_index.json.
