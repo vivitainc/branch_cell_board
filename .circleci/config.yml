@@ -113,6 +113,7 @@ workflows:
               board_type:
                 - 0
                 - 1
+                - 2
           filters:
             branches:
               only: /.*/
@@ -124,6 +125,7 @@ workflows:
               board_type:
                 - 0
                 - 1
+                - 2
           filters:
             tags:
               only:
