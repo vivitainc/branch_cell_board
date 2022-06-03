@@ -2,7 +2,7 @@ version: 2.1
 executors:
   build:
     docker:
-      - image: vivitafwteam/arduino-docker:1.1
+      - image: vivitafwteam/arduino-docker:1.11
         auth:
           username: $DOCKERHUB_USER
           password: $DOCKERHUB_PASSWORD
