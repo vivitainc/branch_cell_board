@@ -24,6 +24,10 @@ jobs:
   build:
     executor:
       name: build
+    parameters:
+      board_type:
+        type: integer
+        default: 0
     steps:
       - add_ssh_keys:
           fingerprints:
@@ -42,15 +46,10 @@ jobs:
             cp -r * ${HOME}/.arduino15/packages/viviware/hardware/avr/${BOARD_VER}/
             ls -R   ${HOME}/.arduino15/packages/viviware/hardware/avr
       - run:
-          name: Build all latest branch with version=branch
+          name: Build all latest branch
           command: |
             cd ${GIT_DIR_BRANCH_CELL}
-            bash build.sh -c -a
-      - run:
-          name: Build all latest branch with version=custom
-          command: |
-            cd ${GIT_DIR_BRANCH_CELL}
-            bash build.sh -c -a -t 1
+            bash build.sh -c -a -t <<parameters.board_type>>
 
   deploy:
     executor:
@@ -109,12 +108,22 @@ workflows:
   development:
     jobs:
       - build:
+          matrix:
+            parameters:
+              board_type:
+                - 0
+                - 1
           filters:
             branches:
               only: /.*/
   release:
     jobs:
       - build:
+          matrix:
+            parameters:
+              board_type:
+                - 0
+                - 1
           filters:
             tags:
               only:
