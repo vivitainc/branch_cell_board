@@ -27,6 +27,7 @@
 #define Pins_Arduino_h
 
 #include <avr/pgmspace.h>
+#include "viviware.h"
 
 #define NUM_DIGITAL_PINS            24
 #define NUM_ANALOG_INPUTS           8
@@ -82,8 +83,6 @@ static const uint8_t SCL0 = PIN_WIRE_SCL0;
 static const uint8_t SDA1 = PIN_WIRE_SDA1;
 static const uint8_t SCL1 = PIN_WIRE_SCL1;
 
-#define LED_BUILTIN (6)
-
 #define PIN_A0   (14)
 #define PIN_A1   (15)
 #define PIN_A2   (16)
@@ -102,10 +101,23 @@ static const uint8_t A5 = PIN_A5;
 static const uint8_t A6 = PIN_A6;
 static const uint8_t A7 = PIN_A7;
 
+/* VIVIWARE Cell Branch/Custom pin configurations.
+ * These numbers are index of array digital_pin_to_port_PGM, digital_pin_to_bit_mask_PGM, and digital_pin_to_timer_PGM.
+ * Need to sync with *_VPARTS_* defined on io_328pb.h.
+ */
+#if (BOARD_TYPE == BOARD_TYPE_CUSTOM)
+#define LED_BUILTIN            (13)
+#define PIN_VIVIWARE_EN_RX     (20)
+#define PIN_VIVIWARE_EN_TX     (21)
+#define PIN_VIVIWARE_EN_PWR    (A6)
+#define PIN_VIVIWARE_DEBUG_LED (6)
+#else
+#define LED_BUILTIN            (6)
 #define PIN_VIVIWARE_EN_RX     (7)
 #define PIN_VIVIWARE_EN_TX     (8)
 #define PIN_VIVIWARE_EN_PWR    (A3)
 #define PIN_VIVIWARE_DEBUG_LED (LED_BUILTIN)
+#endif
 
 #define digitalPinToPCICR(p)    (((p) >= 0 && (p) <= 23) ? (&PCICR) : ((uint8_t *)0))
 #define digitalPinToPCICRbit(p) (((p) <= 7) ? 2 : (((p) <= 13) ? 0 : (((p) <= 19) ? 1 : 3)))

@@ -148,7 +148,6 @@
 #define LED      PIND6
 #endif
 
-
 /* monitor functions will only be compiled when using ATmega128, due to bootblock size constraints */
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 #define MONITOR 1
@@ -449,14 +448,13 @@ int main(void)
 	/* set LED pin as output */
 	LED_DDR |= _BV(LED);
 
-#if defined(VPARTS_EN_TX_RX_OPERATION)
 	// PIN_EN_TX to low
-	DDRB |= _BV(PINB0);
-	PORTB &= ~_BV(PINB0);
+	VPARTS_EN_TX_DDR  |= _BV(VPARTS_EN_TX_PIN);
+	VPARTS_EN_TX_PORT &= ~_BV(VPARTS_EN_TX_PIN);
+
 	// PIN_EN_RX to high
-	DDRD |= _BV(PIND7);
-	PORTD |= _BV(PIND7);
-#endif
+	VPARTS_EN_RX_DDR  |= _BV(VPARTS_EN_RX_PIN);
+	VPARTS_EN_RX_PORT |= _BV(VPARTS_EN_RX_PIN);
 
 	/* flash onboard LED to signal entering of bootloader */
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
@@ -964,10 +962,9 @@ void puthex(char ch) {
 
 void putch(char ch)
 {
-#if defined(VPARTS_EN_TX_RX_OPERATION)
 	// PIN_EN_TX to high
-	PORTB |= _BV(PINB0);
-#endif
+	VPARTS_EN_TX_PORT |= _BV(VPARTS_EN_TX_PIN);
+
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
 	if(bootuart == 1) {
 		while (!(UCSR0A & _BV(UDRE0)));
