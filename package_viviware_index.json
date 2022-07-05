@@ -53,50 +53,6 @@
         {
           "name": "VIVIWARE Cell Custom Boards",
           "architecture": "avr",
-          "version": "6.1.0-rc3",
-          "category": "Contributed",
-          "help": {
-            "online": "https://github.com/vivitainc/custom_cell_boards"
-          },
-          "url": "https://github.com/vivitainc/custom_cell_boards/archive/6.1.0-rc3.zip",
-          "archiveFileName": "custom_cell_boards-6.1.0-rc3.zip",
-          "checksum": "SHA-256:69830822dbac27b9afd69f2d2cba9241e2e3559433b85ff5712197155cf41a59",
-          "size": "138210",
-          "boards": [
-            {
-              "name": "VIVIWARE Cell Branch"
-            },
-            {
-              "name": "VIVIWARE Cell Custom"
-            }
-          ],
-          "toolsDependencies": []
-        },
-        {
-          "name": "VIVIWARE Cell Custom Boards",
-          "architecture": "avr",
-          "version": "6.1.0-rc2",
-          "category": "Contributed",
-          "help": {
-            "online": "https://github.com/vivitainc/custom_cell_boards"
-          },
-          "url": "https://github.com/vivitainc/custom_cell_boards/archive/6.1.0-rc2.zip",
-          "archiveFileName": "custom_cell_boards-6.1.0-rc2.zip",
-          "checksum": "SHA-256:106ae68801654db2b472bf0eb27a8cd2fcfecaf892ef503109be02c04f259ff9",
-          "size": "147150",
-          "boards": [
-            {
-              "name": "VIVIWARE Cell Branch"
-            },
-            {
-              "name": "VIVIWARE Cell Custom"
-            }
-          ],
-          "toolsDependencies": []
-        },
-        {
-          "name": "VIVIWARE Cell Custom Boards",
-          "architecture": "avr",
           "version": "6.0.2",
           "category": "Contributed",
           "help": {
@@ -106,28 +62,6 @@
           "archiveFileName": "custom_cell_boards-6.0.2.zip",
           "checksum": "SHA-256:6e2e5a6d3702601a5048be66b2c489f7984ed98227a63e57737bb44a0814a9bb",
           "size": "139643",
-          "boards": [
-            {
-              "name": "VIVIWARE Cell Branch"
-            },
-            {
-              "name": "VIVIWARE Cell Custom"
-            }
-          ],
-          "toolsDependencies": []
-        },
-        {
-          "name": "VIVIWARE Cell Custom Boards",
-          "architecture": "avr",
-          "version": "6.0.2-rc1",
-          "category": "Contributed",
-          "help": {
-            "online": "https://github.com/vivitainc/custom_cell_boards"
-          },
-          "url": "https://github.com/vivitainc/custom_cell_boards/archive/6.0.2-rc1.zip",
-          "archiveFileName": "custom_cell_boards-6.0.2-rc1.zip",
-          "checksum": "SHA-256:6e5a7a0bf537dee78f49daa4b604e9887bc3df7f67196281b2a307b0d2688d57",
-          "size": "140445",
           "boards": [
             {
               "name": "VIVIWARE Cell Branch"
@@ -172,28 +106,6 @@
           "archiveFileName": "custom_cell_boards-6.0.0.zip",
           "checksum": "SHA-256:76e71fe98f697cd629a064ab6be6563ee7f49ed1ad3dbcb2efaf56619e7e8601",
           "size": "140125",
-          "boards": [
-            {
-              "name": "VIVIWARE Cell Branch"
-            },
-            {
-              "name": "VIVIWARE Cell Custom"
-            }
-          ],
-          "toolsDependencies": []
-        },
-        {
-          "name": "VIVIWARE Cell Custom Boards",
-          "architecture": "avr",
-          "version": "6.0.0-rc1",
-          "category": "Contributed",
-          "help": {
-            "online": "https://github.com/vivitainc/custom_cell_boards"
-          },
-          "url": "https://github.com/vivitainc/custom_cell_boards/archive/6.0.0-rc1.zip",
-          "archiveFileName": "custom_cell_boards-6.0.0-rc1.zip",
-          "checksum": "SHA-256:cb6f0457269ec1772f7a5a48ff7ca061b57944422fce8a562e520377dbd5d3a0",
-          "size": "191460",
           "boards": [
             {
               "name": "VIVIWARE Cell Branch"
