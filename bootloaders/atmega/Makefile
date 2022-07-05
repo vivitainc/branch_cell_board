@@ -1,3 +1,5 @@
+.PHONY: all clean
+
 # Makefile for ATmegaBOOT
 # E.Lins, 18.7.2005
 #
@@ -27,6 +29,7 @@ MCU_TARGET = atmega168
 LDSECTION  = --section-start=.text=0x3800
 
 TOOLCHAIN_PREFIX ?= "C:\WinAVR-20100110\bin\\"
+IO_328PB_HEADER := "..\..\variants\cell-328pb\io_328pb.h"
 
 # the efuse should really be 0xf8; since, however, only the lower
 # three bits of that byte are used on the atmega168, avrdude gets
@@ -66,7 +69,9 @@ override LDFLAGS       = -Wl,$(LDSECTION)
 OBJCOPY        = $(TOOLCHAIN_PREFIX)avr-objcopy
 OBJDUMP        = $(TOOLCHAIN_PREFIX)avr-objdump
 
-all: atmega328_pro8
+all:
+	@+$(MAKE) atmega328pb_branch
+	@+$(MAKE) atmega328pb_custom
 
 lilypad: TARGET = lilypad
 lilypad: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>1' '-DNUM_LED_FLASHES=3'
@@ -182,20 +187,33 @@ atmega328_notp_isp: LFUSE = FF
 atmega328_notp_isp: EFUSE = 05
 atmega328_notp_isp: isp
 
-atmega328_pro8: TARGET = atmega328_pro_8MHz_vparts
-atmega328_pro8: MCU_TARGET = atmega328p
-atmega328_pro8: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1' -DBAUD_RATE=57600 -DDOUBLE_SPEED -DVPARTS_EN_TX_RX_OPERATION
-atmega328_pro8: AVR_FREQ = 8000000L
-atmega328_pro8: LDSECTION  = --section-start=.text=0x7800
-atmega328_pro8: $(PROGRAM)_atmega328_pro_8MHz_vparts.hex
+atmega328pb_branch: MCU_TARGET = atmega328p
+atmega328pb_branch: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1' -DBAUD_RATE=57600 -DDOUBLE_SPEED -DBOARD_TYPE=BOARD_TYPE_BRANCH -include $(IO_328PB_HEADER)
+atmega328pb_branch: AVR_FREQ = 8000000L
+atmega328pb_branch: LDSECTION  = --section-start=.text=0x7800
+atmega328pb_branch: $(PROGRAM)_atmega328pb_branch_8MHz_vparts.hex
 
-atmega328_pro8_isp: atmega328_pro8
-atmega328_pro8_isp: TARGET = atmega328_pro_8MHz
-atmega328_pro8_isp: MCU_TARGET = atmega328p
-atmega328_pro8_isp: HFUSE = DA
-atmega328_pro8_isp: LFUSE = FF
-atmega328_pro8_isp: EFUSE = 05
-atmega328_pro8_isp: isp
+atmega328pb_branch_isp: atmega328pb_branch
+atmega328pb_branch_isp: TARGET = atmega328pb_branch_8MHz
+atmega328pb_branch_isp: MCU_TARGET = atmega328p
+atmega328pb_branch_isp: HFUSE = DA
+atmega328pb_branch_isp: LFUSE = FF
+atmega328pb_branch_isp: EFUSE = 05
+atmega328pb_branch_isp: isp
+
+atmega328pb_custom: MCU_TARGET = atmega328p
+atmega328pb_custom: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1' -DBAUD_RATE=57600 -DDOUBLE_SPEED -DBOARD_TYPE=BOARD_TYPE_CUSTOM -include $(IO_328PB_HEADER)
+atmega328pb_custom: AVR_FREQ = 8000000L
+atmega328pb_custom: LDSECTION  = --section-start=.text=0x7800
+atmega328pb_custom: $(PROGRAM)_atmega328pb_custom_8MHz_vparts.hex
+
+atmega328pb_custom_isp: atmega328pb_custom
+atmega328pb_custom_isp: TARGET = atmega328pb_custom_8MHz
+atmega328pb_custom_isp: MCU_TARGET = atmega328p
+atmega328pb_custom_isp: HFUSE = DA
+atmega328pb_custom_isp: LFUSE = FF
+atmega328pb_custom_isp: EFUSE = 05
+atmega328pb_custom_isp: isp
 
 mega: TARGET = atmega1280
 mega: MCU_TARGET = atmega1280

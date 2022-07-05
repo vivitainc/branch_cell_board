@@ -1,5 +1,5 @@
 name=VIVIWARE Cell
-version=6.1.0
+version=6.2.0
 
 tools.avrdudecustom.path={runtime.tools.avrdude.path}
 tools.avrdudecustom.cmd.path={path}/bin/avrdude

@@ -12,7 +12,6 @@ cell-328pb.bootloader.tool=avrdudecustom
 cell-328pb.bootloader.low_fuses=0xFF
 cell-328pb.bootloader.high_fuses=0xD2
 cell-328pb.bootloader.extended_fuses=0xF5
-cell-328pb.bootloader.file=atmega/ATmegaBOOT_168_atmega328_pro_8MHz_vparts.hex
 cell-328pb.bootloader.unlock_bits=0xFF
 cell-328pb.bootloader.lock_bits=0x0F
 
@@ -26,11 +25,19 @@ cell-328pb.build.variant=cell-328pb
 ##############################################################
 cell-328pb.menu.version.custom=Custom
 cell-328pb.menu.version.custom.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_CUSTOM -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
+cell-328pb.menu.version.custom.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb_custom_8MHz_vparts.hex
+
+##############################################################
+cell-328pb.menu.version.deprecated_custom=DeprecatedCustom
+cell-328pb.menu.version.deprecated_custom.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_DEPRECATED_CUSTOM -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
+cell-328pb.menu.version.deprecated_custom.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb_branch_8MHz_vparts.hex
 
 ##############################################################
 cell-328pb.menu.version.user_branch=UserBranch
 cell-328pb.menu.version.user_branch.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_USER_BRANCH -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
+cell-328pb.menu.version.user_branch.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb_branch_8MHz_vparts.hex
 
 ##############################################################
 cell-328pb.menu.version.branch=Branch
 cell-328pb.menu.version.branch.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_BRANCH -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
+cell-328pb.menu.version.branch.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb_branch_8MHz_vparts.hex

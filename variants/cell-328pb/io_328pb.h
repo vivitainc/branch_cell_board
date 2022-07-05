@@ -8,6 +8,7 @@
  */
 
 #include <avr/io.h>
+#include "viviware.h"
 
 #ifndef _AVR_ATMEGA328PB_H_INCLUDED
 #define _AVR_ATMEGA328PB_H_INCLUDED
@@ -362,5 +363,23 @@
 
 #undef SIGNATURE_2
 #define SIGNATURE_2 0x16
+
+/* VIVIWARE Cell Branch/Custom pin configurations. */
+/* Need to sync with PIN_VIVIWARE_* defined on pins_arduino.h */
+#if (BOARD_TYPE == BOARD_TYPE_CUSTOM)
+#  define VPARTS_EN_TX_DDR  (DDRE)
+#  define VPARTS_EN_TX_PORT (PORTE)
+#  define VPARTS_EN_TX_PIN  (PINE1)
+#  define VPARTS_EN_RX_DDR  (DDRE)
+#  define VPARTS_EN_RX_PORT (PORTE)
+#  define VPARTS_EN_RX_PIN  (PINE0)
+#else
+#  define VPARTS_EN_TX_DDR  (DDRB)
+#  define VPARTS_EN_TX_PORT (PORTB)
+#  define VPARTS_EN_TX_PIN  (PINB0)
+#  define VPARTS_EN_RX_DDR  (DDRD)
+#  define VPARTS_EN_RX_PORT (PORTD)
+#  define VPARTS_EN_RX_PIN  (PIND7)
+#endif
 
 #endif   /* #ifdef _AVR_ATMEGA328PB_H_INCLUDED */
