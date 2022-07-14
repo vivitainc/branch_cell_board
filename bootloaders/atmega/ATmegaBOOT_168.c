@@ -7,6 +7,7 @@
 /* ATmegaBOOT.c                                           */
 /*                                                        */
 /*                                                        */
+/* 20220714: added bootloader option for Custom Cell v3   */
 /* 20200121: GPIO0 |= 1 to notify firmware app            */
 /*           if reset condition is watchdog               */
 /* 20190118: turned off watchdog to avoid reiterate reset */

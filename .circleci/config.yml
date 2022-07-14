@@ -36,7 +36,7 @@ jobs:
       - run:
           name: Checkout branch_cell
           command: |
-            git clone -b feature/id/5979/master git@github.com:vivitainc/branch_cell.git ${GIT_DIR_BRANCH_CELL}
+            git clone git@github.com:vivitainc/branch_cell.git ${GIT_DIR_BRANCH_CELL}
       - run:
           name: Apply latest board configuration
           command: |
