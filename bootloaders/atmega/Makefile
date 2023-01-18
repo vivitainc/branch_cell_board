@@ -72,6 +72,7 @@ OBJDUMP        = $(TOOLCHAIN_PREFIX)avr-objdump
 all:
 	@+$(MAKE) atmega328pb_branch
 	@+$(MAKE) atmega328pb_custom
+	@+$(MAKE) atmega328pb_deprecated_custom
 
 lilypad: TARGET = lilypad
 lilypad: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>1' '-DNUM_LED_FLASHES=3'
@@ -214,6 +215,20 @@ atmega328pb_custom_isp: HFUSE = DA
 atmega328pb_custom_isp: LFUSE = FF
 atmega328pb_custom_isp: EFUSE = 05
 atmega328pb_custom_isp: isp
+
+atmega328pb_deprecated_custom: MCU_TARGET = atmega328p
+atmega328pb_deprecated_custom: CFLAGS += '-DMAX_TIME_COUNT=F_CPU>>4' '-DNUM_LED_FLASHES=1' -DBAUD_RATE=57600 -DDOUBLE_SPEED -DBOARD_TYPE=BOARD_TYPE_DEPRECATED_CUSTOM -include $(IO_328PB_HEADER)
+atmega328pb_deprecated_custom: AVR_FREQ = 8000000L
+atmega328pb_deprecated_custom: LDSECTION  = --section-start=.text=0x7800
+atmega328pb_deprecated_custom: $(PROGRAM)_atmega328pb_deprecated_custom_8MHz_vparts.hex
+
+atmega328pb_deprecated_custom_isp: atmega328pb_deprecated_custom
+atmega328pb_deprecated_custom_isp: TARGET = atmega328pb_deprecated_custom_8MHz
+atmega328pb_deprecated_custom_isp: MCU_TARGET = atmega328p
+atmega328pb_deprecated_custom_isp: HFUSE = DA
+atmega328pb_deprecated_custom_isp: LFUSE = FF
+atmega328pb_deprecated_custom_isp: EFUSE = 05
+atmega328pb_deprecated_custom_isp: isp
 
 mega: TARGET = atmega1280
 mega: MCU_TARGET = atmega1280

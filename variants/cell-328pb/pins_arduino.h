@@ -107,8 +107,13 @@ static const uint8_t A7 = PIN_A7;
  */
 #if (BOARD_TYPE == BOARD_TYPE_CUSTOM)
 #define LED_BUILTIN            (13)
-#define PIN_VIVIWARE_EN_RX     (20)
-#define PIN_VIVIWARE_EN_TX     (21)
+#define PIN_VIVIWARE_EN_TX     (23)
+#define PIN_VIVIWARE_EN_PWR    (22)
+#define PIN_VIVIWARE_DEBUG_LED (6)
+#elif (BOARD_TYPE == BOARD_TYPE_DEPRECATED_CUSTOM)
+#define LED_BUILTIN            (13)
+#define PIN_VIVIWARE_EN_RX     (22)
+#define PIN_VIVIWARE_EN_TX     (23)
 #define PIN_VIVIWARE_EN_PWR    (A6)
 #define PIN_VIVIWARE_DEBUG_LED (6)
 #else
