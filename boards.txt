@@ -30,7 +30,7 @@ cell-328pb.menu.version.custom.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb
 ##############################################################
 cell-328pb.menu.version.deprecated_custom=DeprecatedCustom
 cell-328pb.menu.version.deprecated_custom.build.extra_flags=-DBOARD_TYPE=BOARD_TYPE_DEPRECATED_CUSTOM -include "{runtime.platform.path}/variants/cell-328pb/io_328pb.h"
-cell-328pb.menu.version.deprecated_custom.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb_branch_8MHz_vparts.hex
+cell-328pb.menu.version.deprecated_custom.bootloader.file=atmega/ATmegaBOOT_168_atmega328pb_deprecated_custom_8MHz_vparts.hex
 
 ##############################################################
 cell-328pb.menu.version.user_branch=UserBranch
