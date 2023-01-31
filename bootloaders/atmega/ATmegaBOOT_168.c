@@ -453,9 +453,13 @@ int main(void)
 	VPARTS_EN_TX_DDR  |= _BV(VPARTS_EN_TX_PIN);
 	VPARTS_EN_TX_PORT &= ~_BV(VPARTS_EN_TX_PIN);
 
+#if (BOARD_TYPE == BOARD_TYPE_CUSTOM)
+  // Do nothing
+#else
 	// PIN_EN_RX to high
 	VPARTS_EN_RX_DDR  |= _BV(VPARTS_EN_RX_PIN);
 	VPARTS_EN_RX_PORT |= _BV(VPARTS_EN_RX_PIN);
+#endif
 
 	/* flash onboard LED to signal entering of bootloader */
 #if defined(__AVR_ATmega128__) || defined(__AVR_ATmega1280__)
