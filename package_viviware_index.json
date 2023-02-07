@@ -9,6 +9,28 @@
         {
           "name": "VIVIWARE Cell Custom Boards",
           "architecture": "avr",
+          "version": "6.3.1-rc1",
+          "category": "Contributed",
+          "help": {
+            "online": "https://github.com/vivitainc/custom_cell_boards"
+          },
+          "url": "https://github.com/vivitainc/custom_cell_boards/archive/6.3.1-rc1.zip",
+          "archiveFileName": "custom_cell_boards-6.3.1-rc1.zip",
+          "checksum": "SHA-256:89b5f6aee947e4dcdcacd10e52cf32086d511100ca00897b1b0b86776f1e78b2",
+          "size": "143643",
+          "boards": [
+            {
+              "name": "VIVIWARE Cell Branch"
+            },
+            {
+              "name": "VIVIWARE Cell Custom"
+            }
+          ],
+          "toolsDependencies": []
+        },
+        {
+          "name": "VIVIWARE Cell Custom Boards",
+          "architecture": "avr",
           "version": "6.3.0",
           "category": "Contributed",
           "help": {
