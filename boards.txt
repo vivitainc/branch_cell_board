@@ -12,7 +12,7 @@ cell-328pb.bootloader.tool=avrdudecustom
 cell-328pb.bootloader.low_fuses=0xFF
 cell-328pb.bootloader.high_fuses=0xD2
 cell-328pb.bootloader.extended_fuses=0xF5
-cell-328pb.bootloader.unlock_bits=0xFF
+cell-328pb.bootloader.unlock_bits=0x3F
 cell-328pb.bootloader.lock_bits=0x0F
 
 #cell-328pb.build.mcu=atmega328pb
