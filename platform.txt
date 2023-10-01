@@ -12,7 +12,7 @@ tools.avrdudecustom.upload.pattern="{cmd.path}" "-C{config.path}" {upload.verbos
 
 tools.avrdudecustom.erase.params.verbose=-v
 tools.avrdudecustom.erase.params.quiet=-q -q
-tools.avrdudecustom.erase.pattern="{cmd.path}" "-C{config.path}" {erase.verbose} -p{upload.mcu} -c{protocol} {program.extra_params} -B 5 -e -Ulock:w:{bootloader.unlock_bits}:m -Uefuse:w:{bootloader.extended_fuses}:m -Uhfuse:w:{bootloader.high_fuses}:m -Ulfuse:w:{bootloader.low_fuses}:m
+tools.avrdudecustom.erase.pattern="{cmd.path}" "-C{config.path}" {erase.verbose} -p{upload.mcu} -c{protocol} {program.extra_params} -B 5 -e -Uefuse:w:{bootloader.extended_fuses}:m -Uhfuse:w:{bootloader.high_fuses}:m -Ulfuse:w:{bootloader.low_fuses}:m
 
 tools.avrdudecustom.program.params.verbose=-v
 tools.avrdudecustom.program.params.quiet=-q -q
