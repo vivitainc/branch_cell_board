@@ -5,6 +5,7 @@ This configuration is based on [Pololu A-Star configuration](https://github.com/
 Refer to [README on VivicoreSerial library](https://github.com/vivitainc/VivicoreSerial#how-to-setup).
 
 # Version history
+- 6.3.2-rc1 (2023-10-01): Fix warning to clear lock bits at writing bootloader
 - 6.3.1 (2023-02-19): Add pin definition PIN_VIVIWARE_VERSION for VIVIWARE Custom Cell v4 board or later.
 - 6.3.0 (2023-01-28): Support VIVIWARE Custom Cell v4 board, v3 is deprecated, and v1-v2 are dropped.
 - 6.2.0 (2022-06-19): Support VIVIWARE Custom Cell v3 board, v1-v2 are deprecated.
